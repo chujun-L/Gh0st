@@ -1,4 +1,4 @@
-// Microsoft Visual C++ 生成的资源脚本。
+// Microsoft Visual C++ generated resource script.
 //
 #pragma code_page(65001)
 
@@ -7,7 +7,7 @@
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
 //
-// 从 TEXTINCLUDE 2 资源生成。
+// Generated from the TEXTINCLUDE 2 resource.
 //
 #ifndef APSTUDIO_INVOKED
 #include "targetver.h"
@@ -18,18 +18,24 @@
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
+/////////////////////////////////////////////////////////////////////////////
+// 中文(简体，中国) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE
+2 TEXTINCLUDE 
 BEGIN
     "#ifndef APSTUDIO_INVOKED\r\n"
     "#include ""targetver.h""\r\n"
@@ -39,7 +45,7 @@ BEGIN
     "\0"
 END
 
-3 TEXTINCLUDE
+3 TEXTINCLUDE 
 BEGIN
     "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
     "#define _AFX_NO_OLE_RESOURCES\r\n"
@@ -48,41 +54,37 @@ BEGIN
     "\r\n"
     "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
     "LANGUAGE 4, 2\r\n"
-    "#include ""res\\UI.rc2""  // 非 Microsoft Visual C++ 编辑的资源\r\n"
-    "#include ""l.CHS\\afxres.rc""      // 标准组件\r\n"
+    "#include ""res\\UI.rc2""  // 闈?Microsoft Visual C++ 缂栬緫鐨勮祫婧?\n"
+    "#include ""l.CHS\\afxres.rc""      // 鏍囧噯缁勪欢\r\n"
     "#if !defined(_AFXDLL)\r\n"
-    "#include ""l.CHS\\afxribbon.rc""   // MFC 功能区和控制条资源\r\n"
+    "#include ""l.CHS\\afxribbon.rc""   // MFC 鍔熻兘鍖哄拰鎺у埗鏉¤祫婧?\n"
     "#endif\r\n"
     "#endif\r\n"
     "\0"
 END
 
-/////////////////////////////////////////////////////////////////////////////
 #endif    // APSTUDIO_INVOKED
 
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// 图标
+// Icon
 //
 
-// ID 值最低的图标放在最前面，以确保应用程序图标
-// 在所有系统中保持一致。
-IDR_MAINFRAME           ICON         "res\\UI.ico"
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\UI.ico"
 
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
-LANGUAGE 4, 2
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// 对话框
+// Dialog
 //
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "关于 UI"
-FONT 9, "MS Shell Dlg"
+FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,14,14,21,20
     LTEXT           "UI，版本 1.0",IDC_STATIC,42,14,114,8,SS_NOPREFIX
@@ -90,36 +92,33 @@ BEGIN
     DEFPUSHBUTTON   "确定",IDOK,113,41,50,14,WS_GROUP
 END
 
-IDD_UI_DIALOG DIALOGEX  0, 0, 320, 200
-STYLE DS_SHELLFONT | WS_POPUP | WS_VISIBLE | WS_CAPTION
- | WS_THICKFRAME
- | WS_SYSMENU
+IDD_UI_DIALOG DIALOGEX 0, 0, 320, 200
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 EXSTYLE WS_EX_APPWINDOW
-CAPTION ""
-FONT 9, "MS Shell Dlg"
+FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "确定",IDOK,209,179,50,14
-    PUSHBUTTON      "取消",IDCANCEL,263,179,50,14
-    CTEXT           "TODO: 在此放置对话框控件。",IDC_STATIC,10,96,300,8
+    CONTROL         "",IDC_LIST_ONLINE,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,46,306,50
+    CONTROL         "",IDC_LIST_EVENT_LOG,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,118,306,50
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// 版本
+// Version
 //
 
-VS_VERSION_INFO     VERSIONINFO
-  FILEVERSION       1,0,0,1
-  PRODUCTVERSION    1,0,0,1
- FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
- FILEFLAGS VS_FF_DEBUG
+ FILEFLAGS 0x1L
 #else
  FILEFLAGS 0x0L
 #endif
- FILEOS VOS_NT_WINDOWS32
- FILETYPE VFT_APP
- FILESUBTYPE VFT2_UNKNOWN
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
@@ -127,19 +126,20 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "TODO: <公司名>"
             VALUE "FileDescription", "UI"
-            VALUE "FileVersion",     "1.0.0.1"
-            VALUE "InternalName",    "UI.exe"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "UI.exe"
             VALUE "LegalCopyright", "TODO:  (C) <公司名>。  保留所有权利。"
-            VALUE "OriginalFilename","UI.exe"
+            VALUE "OriginalFilename", "UI.exe"
             VALUE "ProductName", "TODO: <产品名>"
-            VALUE "ProductVersion",  "1.0.0.1"
+            VALUE "ProductVersion", "1.0.0.1"
         END
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x0804, 1200
+        VALUE "Translation", 0x804, 1200
     END
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -156,6 +156,7 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 55
     END
+
     IDD_UI_DIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 7
@@ -167,24 +168,102 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAIN_MENU MENU
+BEGIN
+    POPUP "文件"
+    BEGIN
+        MENUITEM "退出",                          ID_MIAN_CLOSE
+    END
+    POPUP "设置"
+    BEGIN
+        MENUITEM "参数设置",                        ID_MAIN_SETTING
+        MENUITEM "生成服务端",                       ID_MAIN_CREATE_SERVER
+    END
+    POPUP "帮助"
+    BEGIN
+        MENUITEM "关于",                          ID_MAIN_ABOUT
+    END
+END
+
+IDR_MENU_NOTIFY MENU
+BEGIN
+    POPUP "托盘"
+    BEGIN
+        MENUITEM "显示",                          ID_NOTIFY_SHOW
+        MENUITEM "退出",                          ID_NOTIFY_EXIT
+    END
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// 字符串表
+// Toolbar
+//
+
+IDR_TOOLBAR_MAIN TOOLBAR 48, 48
+BEGIN
+    BUTTON      ID_BUTTON32782
+    BUTTON      ID_ONLINE_PROCESS
+    BUTTON      ID_ONLINE_WINDOWS
+    BUTTON      ID_ONLINE_DESKTOP
+    BUTTON      ID_ONLINE_FILE
+    BUTTON      ID_ONLINE_AUDIO
+    BUTTON      ID_ONLINE_VIDEO
+    BUTTON      ID_ONLINE_SERVICE
+    BUTTON      ID_ONLINE_REGISTRY
+    SEPARATOR
+    BUTTON      ID_MAIN_SETTING
+    BUTTON      ID_MAIN_CREATE_SERVER
+    BUTTON      ID_MAIN_ABOUT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_TOOLBAR_MAIN        BITMAP                  "res\\MainToolBar.bmp"
+
+IDB_BITMAP_MAIN_TOOLBAR BITMAP                  "res\\ToolBar_Main.bmp"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_UI_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
 //
 
 STRINGTABLE
 BEGIN
     IDS_ABOUTBOX            "关于 UI(&A)..."
+    IDR_STATUSBAR_STRING    "就绪"
 END
 
+#endif    // 中文(简体，中国) resources
+/////////////////////////////////////////////////////////////////////////////
 
-#endif
+
 
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
-// 从 TEXTINCLUDE 3 资源生成。
+// Generated from the TEXTINCLUDE 3 resource.
 //
 #define _AFX_NO_SPLITTER_RESOURCES
 #define _AFX_NO_OLE_RESOURCES
@@ -193,12 +272,13 @@ END
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE 4, 2
-#include "res\\UI.rc2"  // 非 Microsoft Visual C++ 编辑的资源
-#include "l.CHS\\afxres.rc"      // 标准组件
+#include "res\UI.rc2"  // 闈?Microsoft Visual C++ 缂栬緫鐨勮祫婧?
+#include "l.CHS\afxres.rc"      // 鏍囧噯缁勪欢
 #if !defined(_AFXDLL)
-#include "l.CHS\\afxribbon.rc"   // MFC 功能区和控件条资源
+#include "l.CHS\afxribbon.rc"   // MFC 鍔熻兘鍖哄拰鎺у埗鏉¤祫婧?
 #endif
 #endif
+
 /////////////////////////////////////////////////////////////////////////////
-#endif    // 不是 APSTUDIO_INVOKED
+#endif    // not APSTUDIO_INVOKED
 
