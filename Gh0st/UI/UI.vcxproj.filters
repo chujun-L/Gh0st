@@ -39,6 +39,9 @@
     <ClInclude Include="macros.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="CSettingDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI.cpp">
@@ -51,6 +54,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TrueColorToolBar.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CSettingDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

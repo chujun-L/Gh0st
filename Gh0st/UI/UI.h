@@ -9,6 +9,7 @@
 #endif
 
 #include "resource.h"		// 主符号
+#include "IniFile/IniFile.h"
 
 
 // CUIApp:
@@ -19,6 +20,8 @@ class CUIApp : public CWinApp
 {
 public:
 	CUIApp();
+
+	CIniFile m_iniFile;
 
 // 重写
 public:

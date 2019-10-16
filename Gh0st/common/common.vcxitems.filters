@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="IniFile">
+      <UniqueIdentifier>{4b9cc883-2fc4-4676-bd35-44a417e15e28}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)IniFile\IniFile.cpp">
+      <Filter>IniFile</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)IniFile\IniFile.h">
+      <Filter>IniFile</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

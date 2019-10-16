@@ -7,6 +7,7 @@
 #include "UI.h"
 #include "UIDlg.h"
 #include "afxdialogex.h"
+#include "CSettingDlg.h"
 #include "macros.h"
 
 #ifdef _DEBUG
@@ -57,6 +58,7 @@ CUIDlg::CUIDlg(CWnd* pParent /*=nullptr*/)
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	m_hMenu = nullptr;
 	m_nWndWidth = NULL;
+	ZeroMemory(&m_nifNotify, sizeof(m_nifNotify));
 }
 
 // 加载UI
@@ -119,9 +121,36 @@ void CUIDlg::InitOnlineListCtrl()
 
 	for (INT i = 0; i < UI_ONLINE_COLUMNS; ++i) {
 		m_lcOnline.InsertColumn(i,
-								g_uiOnlineClumn[i].chTitle,
+								g_uiOnlineColumn[i].chTitle,
 								LVCFMT_CENTER,
-								g_uiOnlineClumn[i].nWidth);
+								g_uiOnlineColumn[i].nWidth);
+	}
+
+
+	// test
+	CString strColumn[] = { "127.0.0.1",
+							"本地",
+							"lenovo",
+							"win10",
+							"xen",
+							"yes",
+							"100M" };
+
+	for (INT i = 0; i < UI_ONLINE_COLUMNS; ++i) {
+		g_uiOnlineColumn[i].strContext = &strColumn[i];
+	}
+	AddOnline();
+}
+
+
+// 添加到上线列表
+void CUIDlg::AddOnline()
+{
+	PUI_COLUMN pColumn = g_uiOnlineColumn;
+	m_lcOnline.InsertItem(0, *(pColumn[0].strContext));
+
+	for (INT i = 1; i < UI_ONLINE_COLUMNS; ++i) {
+		m_lcOnline.SetItemText(0, i, *(pColumn[i].strContext));
 	}
 }
 
@@ -133,12 +162,34 @@ void CUIDlg::InitEventLogListCtrl()
 
 	for (INT i = 0; i < UI_EVENTLOG_COLUMNS; ++i) {
 		m_lcEventLog.InsertColumn(i,
-								g_uiEventLogClumn[i].chTitle,
+								g_uiEventLogColumn[i].chTitle,
 								LVCFMT_CENTER,
-								g_uiEventLogClumn[i].nWidth);
+								g_uiEventLogColumn[i].nWidth);
 
 		// 计算窗口的宽度，用于当窗口大小发生变化时，列的宽度也随这改变
-		m_nWndWidth += g_uiEventLogClumn[i].nWidth;
+		m_nWndWidth += g_uiEventLogColumn[i].nWidth;
+	}
+
+	// test
+	CString strColumn[] = { "成功",
+							GetSystemTime(),
+							"测试" };
+
+	for (INT i = 0; i < UI_EVENTLOG_COLUMNS; ++i) {
+		g_uiEventLogColumn[i].strContext = &strColumn[i];
+	}
+	AddEventLog();
+}
+
+
+// 添加到事件日志列表
+void CUIDlg::AddEventLog()
+{
+	PUI_COLUMN pColumn = g_uiEventLogColumn;
+	m_lcEventLog.InsertItem(0, *(pColumn[0].strContext));
+
+	for (INT i = 1; i < UI_EVENTLOG_COLUMNS; ++i) {
+		m_lcEventLog.SetItemText(0, i, *(pColumn[i].strContext));
 	}
 }
 
@@ -176,6 +227,15 @@ void CUIDlg::InitNotify()
 	Shell_NotifyIcon(NIM_ADD, &m_nifNotify);
 }
 
+
+// 获取系统时间
+CString CUIDlg::GetSystemTime()
+{
+	CTime t = CTime::GetCurrentTime();
+
+	return t.Format("%Y-%m-%d %H:%M:%S");
+}
+
 void CUIDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
@@ -192,6 +252,9 @@ BEGIN_MESSAGE_MAP(CUIDlg, CDialogEx)
 	// 自定义消息处理
 	ON_MESSAGE(UM_ICONNOTIFY, (LRESULT ( __thiscall CWnd::* )(WPARAM, LPARAM))&CUIDlg::OnIconNotify)
 
+	ON_COMMAND(ID_MAIN_SETTING, &CUIDlg::OnMainSetting)
+	ON_COMMAND(ID_MIAN_CLOSE, &CUIDlg::OnMianClose)
+	ON_NOTIFY((WORD)NM_RCLICK, IDC_LIST_ONLINE, &CUIDlg::OnNMRClickListOnline)
 END_MESSAGE_MAP()
 
 
@@ -315,7 +378,7 @@ void CUIDlg::OnSize(UINT nType, int cx, int cy)
 
 		// 按原来的比例缩放列表的宽度
 		for (INT i = 0; i < UI_ONLINE_COLUMNS; ++i) {
-			DOUBLE w = g_uiOnlineClumn[i].nWidth;
+			DOUBLE w = g_uiOnlineColumn[i].nWidth;
 			w /= m_nWndWidth;
 			w *= cx;
 			m_lcOnline.SetColumnWidth(i, (int)w);
@@ -332,7 +395,7 @@ void CUIDlg::OnSize(UINT nType, int cx, int cy)
 
 		// 按原来的比例缩放列表的宽度
 		for (INT i = 0; i < UI_EVENTLOG_COLUMNS; ++i) {
-			DOUBLE w = g_uiEventLogClumn[i].nWidth;
+			DOUBLE w = g_uiEventLogColumn[i].nWidth;
 			w /= m_nWndWidth;
 			w *= cx;
 			m_lcEventLog.SetColumnWidth(i, (int)w);
@@ -385,6 +448,44 @@ void CUIDlg::OnIconNotify(WPARAM wParam, LPARAM lParam)
 	default:
 		break;
 	}
+}
 
 
+// 参数设置
+void CUIDlg::OnMainSetting()
+{
+	CSettingDlg dlg;
+	dlg.DoModal();
+}
+
+
+// 退出
+void CUIDlg::OnMianClose()
+{
+	PostMessage(WM_CLOSE);
+}
+
+
+// 用户在控件online内单击鼠标右键
+void CUIDlg::OnNMRClickListOnline(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	
+	CMenu popup, *pSub;
+	CPoint p;
+
+	popup.LoadMenu(IDR_MENU_LBUTTON);
+	pSub = popup.GetSubMenu(0);
+	GetCursorPos(&p);
+	UINT nSubCount = pSub->GetMenuItemCount();
+
+	// 没有列被选中时菜单显示灰色并不可用
+	if (m_lcOnline.GetSelectedCount() == NULL) {
+		for (UINT i = 0; i < nSubCount; ++i) {
+			pSub->EnableMenuItem(i, MF_BYPOSITION | MF_DISABLED | MF_GRAYED);
+		}
+	}
+	pSub->TrackPopupMenu(TPM_LEFTALIGN, p.x, p.y, this);
+
+	*pResult = 0;
 }

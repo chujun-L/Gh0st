@@ -42,9 +42,10 @@ const CString ButtonTextArray[UI_BUTTON_COUNT] = {
 typedef struct {
 	const CHAR *chTitle;
 	INT			nWidth;
+	CString		*strContext;
 }UI_COLUMN, *PUI_COLUMN;
 
-UI_COLUMN g_uiOnlineClumn[] = {
+UI_COLUMN g_uiOnlineColumn[] = {
 	{"IP",			148},
 	{"区域",			150},
 	{"计算机名",		160},
@@ -54,7 +55,7 @@ UI_COLUMN g_uiOnlineClumn[] = {
 	{"PING",		81}
 };
 
-UI_COLUMN g_uiEventLogClumn[] = {
+UI_COLUMN g_uiEventLogColumn[] = {
 	{"事件类型",		68},
 	{"时间",			100},
 	{"事件内容",		660}

@@ -5,7 +5,13 @@ VisualStudioVersion = 16.0.29409.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UI", "UI\UI.vcxproj", "{49877510-7C4F-4010-819E-CEC3CB49EDDC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common", "common\common.vcxitems", "{B7FCF998-3179-47CA-BD03-DB79D776F107}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		common\common.vcxitems*{49877510-7c4f-4010-819e-cec3cb49eddc}*SharedItemsImports = 4
+		common\common.vcxitems*{b7fcf998-3179-47ca-bd03-db79d776f107}*SharedItemsImports = 9
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86

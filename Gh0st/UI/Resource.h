@@ -7,14 +7,19 @@
 #define IDS_ABOUTBOX                    101
 #define IDD_UI_DIALOG                   102
 #define IDR_STATUSBAR_STRING            102
+#define IDD_MAIN_SETTING                103
 #define IDR_MAINFRAME                   128
 #define IDR_MAIN_MENU                   129
 #define IDR_TOOLBAR_MAIN                130
 #define IDB_BITMAP_MAIN_TOOLBAR         133
 #define IDR_MENU1                       136
 #define IDR_MENU_NOTIFY                 136
+#define IDR_MENU2                       138
+#define IDR_MENU_LBUTTON                138
 #define IDC_LIST_ONLINE                 1000
 #define IDC_LIST_EVENT_LOG              1001
+#define IDC_EDIT_PORT                   1002
+#define IDC_EDIT_MAXCONNECTION          1003
 #define ID_32771                        32771
 #define ID_32772                        32772
 #define ID_32773                        32773
@@ -37,14 +42,34 @@
 #define ID_32796                        32796
 #define ID_NOTIFY_SHOW                  32797
 #define ID_NOTIFY_EXIT                  32798
+#define ID_32799                        32799
+#define ID_32800                        32800
+#define ID_32801                        32801
+#define ID_32802                        32802
+#define ID_32803                        32803
+#define ID_32804                        32804
+#define ID_32805                        32805
+#define ID_32806                        32806
+#define ID_32807                        32807
+#define ID_32808                        32808
+#define IDM_CMD                         32809
+#define IDM_PROCESS                     32810
+#define IDM_WINDOW                      32811
+#define IDM_DESKTOP                     32812
+#define IDM_FILE                        32813
+#define IDM_AUDIO                       32814
+#define IDM_VIDEO                       32815
+#define IDM_SERVICE                     32816
+#define IDM_REGISTRY                    32817
+#define IDM_CLOSE_CONNECT               32818
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        137
-#define _APS_NEXT_COMMAND_VALUE         32799
-#define _APS_NEXT_CONTROL_VALUE         1002
-#define _APS_NEXT_SYMED_VALUE           101
+#define _APS_NEXT_RESOURCE_VALUE        139
+#define _APS_NEXT_COMMAND_VALUE         32819
+#define _APS_NEXT_CONTROL_VALUE         1004
+#define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif

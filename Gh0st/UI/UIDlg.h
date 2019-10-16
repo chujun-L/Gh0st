@@ -9,22 +9,30 @@
 // CUIDlg 对话框
 class CUIDlg : public CDialogEx
 {
-// 构造
 public:
-	CUIDlg(CWnd* pParent = nullptr);	// 标准构造函数
+	// 标准构造函数
+	CUIDlg(CWnd* pParent = nullptr);	
 
 	// UI包括: 1.菜单 2.工具栏 3.在线主机列表 4.事件日志列表 5.状态栏 6.托盘显示
 	void LoadUI();
 	void InitMainMenu();
 	void InitToolBar();
 	void InitOnlineListCtrl();
+	void AddOnline();
 	void InitEventLogListCtrl();
+	void AddEventLog();
 	void InitStatusBar();
 	void InitNotify();
+	CString GetSystemTime();
 
-	afx_msg void OnSize(UINT nType, int cx, int cy);
 	// 自定义消息处理
 	afx_msg void OnIconNotify(WPARAM wParam, LPARAM lParam);
+
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnMainSetting();
+	afx_msg void OnMianClose();
+	afx_msg void OnNMRClickListOnline(NMHDR *pNMHDR, LRESULT *pResult);
+
 
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
@@ -51,5 +59,5 @@ protected:
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
-	DECLARE_MESSAGE_MAP()
+	DECLARE_MESSAGE_MAP()	
 };

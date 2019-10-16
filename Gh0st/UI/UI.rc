@@ -54,10 +54,10 @@ BEGIN
     "\r\n"
     "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
     "LANGUAGE 4, 2\r\n"
-    "#include ""res\\UI.rc2""  // 闈?Microsoft Visual C++ 缂栬緫鐨勮祫婧?\n"
-    "#include ""l.CHS\\afxres.rc""      // 鏍囧噯缁勪欢\r\n"
+    "#include ""res\\UI.rc2""  // 闂?Microsoft Visual C++ 缂傛牞绶惃鍕カ濠?\n"
+    "#include ""l.CHS\\afxres.rc""      // 閺嶅洤鍣紒鍕\r\n"
     "#if !defined(_AFXDLL)\r\n"
-    "#include ""l.CHS\\afxribbon.rc""   // MFC 鍔熻兘鍖哄拰鎺у埗鏉¤祫婧?\n"
+    "#include ""l.CHS\\afxribbon.rc""   // MFC 閸旂喕鍏橀崠鍝勬嫲閹貉冨煑閺壜ょカ濠?\n"
     "#endif\r\n"
     "#endif\r\n"
     "\0"
@@ -99,6 +99,19 @@ FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_LIST_ONLINE,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,46,306,50
     CONTROL         "",IDC_LIST_EVENT_LOG,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,118,306,50
+END
+
+IDD_MAIN_SETTING DIALOGEX 0, 0, 255, 133
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "参数设置"
+FONT 9, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "确定",IDOK,30,91,50,14
+    PUSHBUTTON      "取消",IDCANCEL,139,92,50,14
+    LTEXT           "监听端口",IDC_STATIC,38,22,28,8
+    LTEXT           "最大连接数",IDC_STATIC,39,53,35,8
+    EDITTEXT        IDC_EDIT_PORT,85,19,53,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_MAXCONNECTION,85,52,53,14,ES_AUTOHSCROLL
 END
 
 
@@ -164,6 +177,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 193
     END
+
+    IDD_MAIN_SETTING, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 248
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 126
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -196,6 +217,23 @@ BEGIN
     BEGIN
         MENUITEM "显示",                          ID_NOTIFY_SHOW
         MENUITEM "退出",                          ID_NOTIFY_EXIT
+    END
+END
+
+IDR_MENU_LBUTTON MENU
+BEGIN
+    POPUP "点击鼠标右键"
+    BEGIN
+        MENUITEM "终端管理",                        IDM_CMD
+        MENUITEM "进程管理",                        IDM_PROCESS
+        MENUITEM "窗口管理",                        IDM_WINDOW
+        MENUITEM "桌面管理",                        IDM_DESKTOP
+        MENUITEM "文件管理",                        IDM_FILE
+        MENUITEM "语音管理",                        IDM_AUDIO
+        MENUITEM "视频管理",                        IDM_VIDEO
+        MENUITEM "服务管理",                        IDM_SERVICE
+        MENUITEM "注册表管理",                       IDM_REGISTRY
+        MENUITEM "断开连接",                        IDM_CLOSE_CONNECT
     END
 END
 
@@ -243,6 +281,11 @@ BEGIN
     0
 END
 
+IDD_MAIN_SETTING AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -272,10 +315,10 @@ END
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE 4, 2
-#include "res\UI.rc2"  // 闈?Microsoft Visual C++ 缂栬緫鐨勮祫婧?
-#include "l.CHS\afxres.rc"      // 鏍囧噯缁勪欢
+#include "res\UI.rc2"  // 闂?Microsoft Visual C++ 缂傛牞绶惃鍕カ濠?
+#include "l.CHS\afxres.rc"      // 閺嶅洤鍣紒鍕
 #if !defined(_AFXDLL)
-#include "l.CHS\afxribbon.rc"   // MFC 鍔熻兘鍖哄拰鎺у埗鏉¤祫婧?
+#include "l.CHS\afxribbon.rc"   // MFC 閸旂喕鍏橀崠鍝勬嫲閹貉冨煑閺壜ょカ濠?
 #endif
 #endif
 
