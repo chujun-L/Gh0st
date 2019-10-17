@@ -4,15 +4,63 @@
     <Filter Include="IniFile">
       <UniqueIdentifier>{4b9cc883-2fc4-4676-bd35-44a417e15e28}</UniqueIdentifier>
     </Filter>
+    <Filter Include="IOCPServer">
+      <UniqueIdentifier>{84fd851b-0fe6-4cfd-b78b-159bbaf74e84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib">
+      <UniqueIdentifier>{42bf329e-3bf7-4d15-a5fd-3d2280d70aa7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib\zlib">
+      <UniqueIdentifier>{d30cefee-2cd1-4653-80cd-689df95b405d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Buffer">
+      <UniqueIdentifier>{9c6d57fb-d7dc-48d8-87da-a473d5149972}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CpuUsage">
+      <UniqueIdentifier>{3f8382b4-9108-45f8-9548-2ab8ba2e748a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mapper">
+      <UniqueIdentifier>{79502096-0412-4691-a9e5-f10d05e101bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Macros">
+      <UniqueIdentifier>{21c7b56f-702e-420e-82b3-70af69fa0e0c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)IniFile\IniFile.cpp">
       <Filter>IniFile</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)IOCPServer\IOCPServer.cpp">
+      <Filter>IOCPServer</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Buffer\Buffer.cpp">
+      <Filter>Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)CpuUsage\CpuUsage.cpp">
+      <Filter>CpuUsage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)IniFile\IniFile.h">
       <Filter>IniFile</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)IOCPServer\IOCPServer.h">
+      <Filter>IOCPServer</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)lib\zlib\zlib.h">
+      <Filter>lib\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Buffer\Buffer.h">
+      <Filter>Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)CpuUsage\CpuUsage.h">
+      <Filter>CpuUsage</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Mapper\Mapper.h">
+      <Filter>Mapper</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Macros\macros.h">
+      <Filter>Macros</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

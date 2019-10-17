@@ -1,6 +1,5 @@
 // IniFile.cpp: implementation of the CIniFile class.
-//
-//////////////////////////////////////////////////////////////////////
+
 
 #include "pch.h"
 #include "IniFile.h"
@@ -11,9 +10,7 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 #define MAX_LENGTH 256
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+
 
 CIniFile::CIniFile()
 {
@@ -36,7 +33,6 @@ CIniFile::CIniFile()
 
 CIniFile::~CIniFile()
 {
-	
 }
 
 CString CIniFile::GetString(CString AppName,CString KeyName,CString Default)

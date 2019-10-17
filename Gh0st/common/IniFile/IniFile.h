@@ -1,13 +1,6 @@
 // IniFile.h: interface for the CIniFile class.
-//
-//////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_INIFILE_H__D5A2B7FC_6022_4EA2_9E54_91C4E7B31B8E__INCLUDED_)
-#define AFX_INIFILE_H__D5A2B7FC_6022_4EA2_9E54_91C4E7B31B8E__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 class CIniFile  
 {
@@ -28,5 +21,3 @@ public:
 private:
 	CString IniFileName;
 };
-
-#endif // !defined(AFX_INIFILE_H__D5A2B7FC_6022_4EA2_9E54_91C4E7B31B8E__INCLUDED_)

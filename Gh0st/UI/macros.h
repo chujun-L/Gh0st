@@ -42,7 +42,6 @@ const CString ButtonTextArray[UI_BUTTON_COUNT] = {
 typedef struct {
 	const CHAR *chTitle;
 	INT			nWidth;
-	CString		*strContext;
 }UI_COLUMN, *PUI_COLUMN;
 
 UI_COLUMN g_uiOnlineColumn[] = {
@@ -56,8 +55,8 @@ UI_COLUMN g_uiOnlineColumn[] = {
 };
 
 UI_COLUMN g_uiEventLogColumn[] = {
-	{"事件类型",		68},
 	{"时间",			100},
+	{"事件类型",		68},
 	{"事件内容",		660}
 };
 
@@ -74,4 +73,37 @@ static UINT g_nIndicators[] = {
 // 自定义消息
 enum {	
 	UM_ICONNOTIFY = WM_USER + 0x100,
+};
+
+
+// network
+#define DEFAULT_PORT				8080
+#define DEFAULT_MAX_CONNECTION		999
+
+enum
+{
+	WM_CLIENT_CONNECT = WM_APP + 0x1001,
+	WM_CLIENT_CLOSE,
+	WM_CLIENT_NOTIFY,
+	WM_DATA_IN_MSG,
+	WM_DATA_OUT_MSG,
+
+	WM_ADDONLINE = WM_USER + 102,	// 添加到列表视图中
+	WM_REMOVEFROMLIST,				// 从列表视图中删除
+	WM_OPENMANAGERDIALOG,			// 打开一个文件管理窗口
+	WM_OPENSCREENSPYDIALOG,			// 打开一个屏幕监视窗口
+	WM_OPENWEBCAMDIALOG,			// 打开摄像头监视窗口
+	WM_OPENAUDIODIALOG,				// 打开一个语音监听窗口
+	WM_OPENKEYBOARDDIALOG,			// 打开键盘记录窗口
+	WM_OPENPSLISTDIALOG,			// 打开进程管理窗口
+	WM_OPENSHELLDIALOG,				// 打开shell窗口
+	WM_RESETPORT,					// 改变端口
+
+	FILEMANAGER_DLG = 1,
+	SCREENSPY_DLG,
+	WEBCAM_DLG,
+	AUDIO_DLG,
+	KEYBOARD_DLG,
+	SYSTEM_DLG,
+	SHELL_DLG
 };
