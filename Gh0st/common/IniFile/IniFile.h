@@ -2,6 +2,7 @@
 
 #pragma once
 
+
 class CIniFile  
 {
 public:
