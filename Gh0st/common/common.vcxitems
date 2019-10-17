@@ -15,17 +15,27 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)Buffer\Buffer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)ClientSocket\ClientSocket.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)CpuUsage\CpuUsage.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IniFile\IniFile.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IOCPServer\IOCPServer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)KeyboardManager\KeyboardManager.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Manager\Manager.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)RegEditEx\RegEditEx.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Until\until.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)Buffer\Buffer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)ClientSocket\ClientSocket.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)CpuUsage\CpuUsage.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IniFile\IniFile.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IOCPServer\IOCPServer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)KeyboardManager\KeyboardManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)lib\zlib\zlib.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Macros\macros.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Manager\Manager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Mapper\Mapper.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)RegEditEx\RegEditEx.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Until\until.h" />
   </ItemGroup>
 </Project>

@@ -25,6 +25,21 @@
     <Filter Include="Macros">
       <UniqueIdentifier>{21c7b56f-702e-420e-82b3-70af69fa0e0c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="KeyboardManager">
+      <UniqueIdentifier>{dfe6ddc0-9cd8-4cd1-adf0-f14d9ba4805b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager">
+      <UniqueIdentifier>{566d4d30-9e26-4e2e-aaca-7383fddc82e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ClientSocket">
+      <UniqueIdentifier>{a886f957-b9cd-40ef-b402-f31162e644db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Until">
+      <UniqueIdentifier>{df7b45f7-1727-4aa6-985a-a2077b178986}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RegEditEx">
+      <UniqueIdentifier>{f401b38c-998c-40d4-92ae-88c15a4f34ce}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)IniFile\IniFile.cpp">
@@ -38,6 +53,21 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)CpuUsage\CpuUsage.cpp">
       <Filter>CpuUsage</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)KeyboardManager\KeyboardManager.cpp">
+      <Filter>KeyboardManager</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Manager\Manager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)ClientSocket\ClientSocket.cpp">
+      <Filter>ClientSocket</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Until\until.cpp">
+      <Filter>Until</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)RegEditEx\RegEditEx.cpp">
+      <Filter>RegEditEx</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -61,6 +91,21 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)Macros\macros.h">
       <Filter>Macros</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)KeyboardManager\KeyboardManager.h">
+      <Filter>KeyboardManager</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Manager\Manager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)ClientSocket\ClientSocket.h">
+      <Filter>ClientSocket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Until\until.h">
+      <Filter>Until</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)RegEditEx\RegEditEx.h">
+      <Filter>RegEditEx</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
