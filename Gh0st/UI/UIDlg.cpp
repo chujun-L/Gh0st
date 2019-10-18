@@ -703,7 +703,7 @@ LRESULT CUIDlg::OnAddOnline(WPARAM wParam, LPARAM lParam)
 		//if (!((CGh0stApp *)AfxGetApp())->m_bIsDisablePopTips)
 		//	g_pFrame->ShowToolTips(strToolTipsText);
 
-		std::initializer_list<LPCTSTR> context = { IPAddress, "本地", strPCName,
+		std::initializer_list<LPCTSTR> context = { IPAddress, "null", strPCName,
 											   strOS, strCPU, strVideo, strPing };
 		AddContextListCtrol(m_lcOnline, context);
 

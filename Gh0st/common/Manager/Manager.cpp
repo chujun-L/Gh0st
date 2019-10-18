@@ -26,6 +26,7 @@ CManager::~CManager()
 {
 	CloseHandle(m_hEventDlgOpen);
 }
+
 void CManager::OnReceive(LPBYTE lpBuffer, UINT nSize)
 {
 	
