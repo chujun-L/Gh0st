@@ -32,9 +32,13 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)IOCPServer\IOCPServer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)KeyboardManager\KeyboardManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)lib\zlib\zlib.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)Macros\macros.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Manager\Manager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Mapper\Mapper.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Others\decode.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Others\login.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Others\loop.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Others\macros.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Others\Mapper.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)RegEditEx\RegEditEx.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Until\until.h" />
   </ItemGroup>

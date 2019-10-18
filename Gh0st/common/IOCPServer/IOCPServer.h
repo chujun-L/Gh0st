@@ -112,7 +112,7 @@ inline UINT AFXAPI HashKey(CString & strGuid)
   return HashKey( (LPCTSTR) strGuid);         
 }
 
-#include "Mapper/Mapper.h"
+#include "Others/Mapper.h"
 
 typedef void (CALLBACK* NOTIFYPROC)(LPVOID, ClientContext*, UINT nCode);
 

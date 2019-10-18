@@ -11,7 +11,7 @@
 #include "afxdialogex.h"
 #include "CSettingDlg.h"
 #include "macros.h"
-#include "Macros/macros.h"
+#include "Others/macros.h"
 
 //using namespace std;
 

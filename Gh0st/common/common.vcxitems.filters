@@ -22,9 +22,6 @@
     <Filter Include="Mapper">
       <UniqueIdentifier>{79502096-0412-4691-a9e5-f10d05e101bf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Macros">
-      <UniqueIdentifier>{21c7b56f-702e-420e-82b3-70af69fa0e0c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="KeyboardManager">
       <UniqueIdentifier>{dfe6ddc0-9cd8-4cd1-adf0-f14d9ba4805b}</UniqueIdentifier>
     </Filter>
@@ -39,6 +36,9 @@
     </Filter>
     <Filter Include="RegEditEx">
       <UniqueIdentifier>{f401b38c-998c-40d4-92ae-88c15a4f34ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Others">
+      <UniqueIdentifier>{41602bba-a9d5-4b1a-846a-d85b1b636644}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -89,9 +89,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Mapper\Mapper.h">
       <Filter>Mapper</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Macros\macros.h">
-      <Filter>Macros</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)KeyboardManager\KeyboardManager.h">
       <Filter>KeyboardManager</Filter>
     </ClInclude>
@@ -106,6 +103,21 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)RegEditEx\RegEditEx.h">
       <Filter>RegEditEx</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Others\loop.h">
+      <Filter>Others</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Others\decode.h">
+      <Filter>Others</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Others\login.h">
+      <Filter>Others</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Others\macros.h">
+      <Filter>Others</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Others\Mapper.h">
+      <Filter>Others</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
