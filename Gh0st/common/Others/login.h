@@ -5,10 +5,13 @@
 #include "Others/decode.h"
 #include "Others/macros.h"
 #include "Until/until.h"
+#include "ClientSocket/ClientSocket.h"
 
 
 #pragma comment(lib, "wininet.lib")
 #pragma comment(lib, "vfw32.lib")
+
+
 typedef struct
 {	
 	BYTE			bToken;			// = 1

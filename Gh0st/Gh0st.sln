@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common", "common\common.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DllServer", "DllServer\DllServer.vcxproj", "{32CFB581-7E32-40AF-91F8-A355834F9A46}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestDllServer", "TestDllServer\TestDllServer.vcxproj", "{41826A4D-0AF6-4C0E-BD6A-E406CBC51D97}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		common\common.vcxitems*{32cfb581-7e32-40af-91f8-a355834f9a46}*SharedItemsImports = 4
@@ -38,6 +40,14 @@ Global
 		{32CFB581-7E32-40AF-91F8-A355834F9A46}.Release|x64.Build.0 = Release|x64
 		{32CFB581-7E32-40AF-91F8-A355834F9A46}.Release|x86.ActiveCfg = Release|Win32
 		{32CFB581-7E32-40AF-91F8-A355834F9A46}.Release|x86.Build.0 = Release|Win32
+		{41826A4D-0AF6-4C0E-BD6A-E406CBC51D97}.Debug|x64.ActiveCfg = Debug|x64
+		{41826A4D-0AF6-4C0E-BD6A-E406CBC51D97}.Debug|x64.Build.0 = Debug|x64
+		{41826A4D-0AF6-4C0E-BD6A-E406CBC51D97}.Debug|x86.ActiveCfg = Debug|Win32
+		{41826A4D-0AF6-4C0E-BD6A-E406CBC51D97}.Debug|x86.Build.0 = Debug|Win32
+		{41826A4D-0AF6-4C0E-BD6A-E406CBC51D97}.Release|x64.ActiveCfg = Release|x64
+		{41826A4D-0AF6-4C0E-BD6A-E406CBC51D97}.Release|x64.Build.0 = Release|x64
+		{41826A4D-0AF6-4C0E-BD6A-E406CBC51D97}.Release|x86.ActiveCfg = Release|Win32
+		{41826A4D-0AF6-4C0E-BD6A-E406CBC51D97}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -44,8 +44,11 @@ HANDLE DoCreateThread (LPSECURITY_ATTRIBUTES lpThreadAttributes, // SD
 	THREAD_ARGLIST	arg;
 	arg.start_address     = (unsigned ( __stdcall * )( void * ))lpStartAddress;
 	arg.arglist		      = (void *)lpParameter;
-	arg.bInteractive      = bInteractive;
-	arg.hEventTransferArg = CreateEvent(NULL, false, false, NULL);
+	arg.bInteractive      = bInteractive; // true
+	arg.hEventTransferArg = CreateEvent(NULL, FALSE, FALSE, NULL);
+	if (arg.hEventTransferArg == NULL) {
+		return NULL;
+	}
 
 	hThread = (HANDLE)_beginthreadex((void *)lpThreadAttributes, dwStackSize,
 									ThreadLoader, (void *)&arg,
@@ -54,9 +57,6 @@ HANDLE DoCreateThread (LPSECURITY_ATTRIBUTES lpThreadAttributes, // SD
 		return hThread;
 	}
 
-	if (NULL == arg.hEventTransferArg) {
-		return NULL;
-	}
 	WaitForSingleObject(arg.hEventTransferArg, INFINITE);
 	CloseHandle(arg.hEventTransferArg);
 	
@@ -193,7 +193,7 @@ bool SwitchInputDesktop()
  	DWORD	dwLengthNeeded;
 
 	HDESK	hOldDesktop, hNewDesktop;
-	char	strCurrentDesktop[256], strInputDesktop[256];
+	char	strCurrentDesktop[256] = { 0 }, strInputDesktop[256] = { 0 };
 
 	hOldDesktop = GetThreadDesktop(GetCurrentThreadId());
 	memset(strCurrentDesktop, 0, sizeof(strCurrentDesktop));
