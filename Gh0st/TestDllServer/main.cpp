@@ -45,7 +45,7 @@ int main()
 		return 1;
 	}
 
-	const char *host = "192.168.1.104";
+	const char *host = "192.168.1.102";
 	UINT port = 50010;
 
 	pDLL pTestRun = (pDLL)GetProcAddress(hServerDLL, "TestRun");

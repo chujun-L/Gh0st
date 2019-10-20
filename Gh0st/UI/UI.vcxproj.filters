@@ -42,6 +42,9 @@
     <ClInclude Include="CSettingDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="CShellDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UI.cpp">
@@ -57,6 +60,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="CSettingDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CShellDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -84,6 +90,12 @@
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="res\MainToolBar.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\icon1.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\cmdshell.ico">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

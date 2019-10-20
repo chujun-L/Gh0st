@@ -85,7 +85,7 @@ BOOL CBuffer::Write(PBYTE pData, UINT nSize)
 	CopyMemory(m_pPtr,pData,nSize);
 
 	// Advance Pointer
-	m_pPtr+=nSize;
+	m_pPtr += nSize;
 
 	return nSize;
 }

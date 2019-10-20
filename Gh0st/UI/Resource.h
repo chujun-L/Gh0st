@@ -12,14 +12,15 @@
 #define IDR_MAIN_MENU                   129
 #define IDR_TOOLBAR_MAIN                130
 #define IDB_BITMAP_MAIN_TOOLBAR         133
-#define IDR_MENU1                       136
 #define IDR_MENU_NOTIFY                 136
-#define IDR_MENU2                       138
 #define IDR_MENU_LBUTTON                138
+#define IDD_DIALOG_SHELL                139
+#define IDI_CMDSHELL                    142
 #define IDC_LIST_ONLINE                 1000
 #define IDC_LIST_EVENT_LOG              1001
 #define IDC_EDIT_PORT                   1002
 #define IDC_EDIT_MAXCONNECTION          1003
+#define IDC_EDIT_SHELL                  1004
 #define ID_32771                        32771
 #define ID_32772                        32772
 #define ID_32773                        32773
@@ -29,7 +30,7 @@
 #define ID_MAIN_SERVICE                 32777
 #define ID_MAIN_CREATE_SERVER           32778
 #define ID_MAIN_ABOUT                   32779
-#define ID_BUTTON32782                  32782
+#define ID_ONLINE_CMD                   32782
 #define ID_ONLINE_PROCESS               32783
 #define ID_ONLINE_WINDOWS               32784
 #define ID_ONLINE_DESKTOP               32785
@@ -67,9 +68,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        139
+#define _APS_NEXT_RESOURCE_VALUE        143
 #define _APS_NEXT_COMMAND_VALUE         32819
-#define _APS_NEXT_CONTROL_VALUE         1004
+#define _APS_NEXT_CONTROL_VALUE         1005
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif

