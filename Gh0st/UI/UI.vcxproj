@@ -194,6 +194,7 @@
   <ItemGroup>
     <ClInclude Include="CSettingDlg.h" />
     <ClInclude Include="CShellDlg.h" />
+    <ClInclude Include="CSystemDlg.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="macros.h" />
     <ClInclude Include="pch.h" />
@@ -206,6 +207,7 @@
   <ItemGroup>
     <ClCompile Include="CSettingDlg.cpp" />
     <ClCompile Include="CShellDlg.cpp" />
+    <ClCompile Include="CSystemDlg.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -227,6 +229,7 @@
     <Image Include="res\cmdshell.ico" />
     <Image Include="res\icon1.ico" />
     <Image Include="res\MainToolBar.bmp" />
+    <Image Include="res\system.ico" />
     <Image Include="res\toolbar1.bmp" />
     <Image Include="res\ToolBar_Main.bmp" />
     <Image Include="res\UI.ico" />

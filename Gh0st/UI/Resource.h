@@ -16,11 +16,17 @@
 #define IDR_MENU_LBUTTON                138
 #define IDD_DIALOG_SHELL                139
 #define IDI_CMDSHELL                    142
+#define IDD_DIALOG_SYSTEM               143
+#define IDI_SYSTEM                      146
+#define IDR_PSLIST                      147
 #define IDC_LIST_ONLINE                 1000
 #define IDC_LIST_EVENT_LOG              1001
 #define IDC_EDIT_PORT                   1002
 #define IDC_EDIT_MAXCONNECTION          1003
 #define IDC_EDIT_SHELL                  1004
+#define IDC_TAB                         1005
+#define IDC_LIST_PROCESS                1008
+#define IDC_LIST_WINDOWS                1009
 #define ID_32771                        32771
 #define ID_32772                        32772
 #define ID_32773                        32773
@@ -63,14 +69,21 @@
 #define IDM_SERVICE                     32816
 #define IDM_REGISTRY                    32817
 #define IDM_CLOSE_CONNECT               32818
+#define ID_PSLIST_32819                 32819
+#define ID_PSLIST_32820                 32820
+#define ID_PSLIST_END                   32821
+#define ID_PSLIST_REFLASH               32822
+#define ID_PSLIST_REFLESH               32823
+#define ID_PSLIST_KILLPROCESS           32824
+#define ID_PSLIST_KILL                  32825
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        143
-#define _APS_NEXT_COMMAND_VALUE         32819
-#define _APS_NEXT_CONTROL_VALUE         1005
+#define _APS_NEXT_RESOURCE_VALUE        148
+#define _APS_NEXT_COMMAND_VALUE         32826
+#define _APS_NEXT_CONTROL_VALUE         1010
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif

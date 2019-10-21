@@ -37,11 +37,14 @@ public:
 	afx_msg void OnIconNotify(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnAddOnline(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnOpenShellDlg(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnOpenSystemDialog(WPARAM wParam, LPARAM lParam);
+	
 
 	/* 工具栏的功能实现 */
 	// 终端管理
 	afx_msg void OnOnlineCmd();	
 	// 进程管理
+	afx_msg void OnProcess();
 
 	// 工具栏的功能实现统一调用该函数发送控制命令给肉机
 	void SendSelectedToken(PBYTE pToken, UINT nSize);
@@ -81,5 +84,7 @@ protected:
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
+
 	DECLARE_MESSAGE_MAP()
+
 };

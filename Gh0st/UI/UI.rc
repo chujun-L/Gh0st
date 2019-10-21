@@ -54,10 +54,10 @@ BEGIN
     "\r\n"
     "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
     "LANGUAGE 4, 2\r\n"
-    "#include ""res\\UI.rc2""  // 闂?Microsoft Visual C++ 缂傚倹鐗炵欢顐︽儍閸曨喚銈繝?\n"
-    "#include ""l.CHS\\afxres.rc""      // 闁哄秴娲ら崳顖滅磼閸曨亝顐?\n"
+    "#include ""res\\UI.rc2""  // 闂?Microsoft Visual C++ 缂傚倸鍊归悧鐐垫椤愶附鍎嶉柛鏇ㄥ枤閵堫偅绻?\n"
+    "#include ""l.CHS\\afxres.rc""      // 闂佸搫绉村ú銈夊闯椤栨粎纾奸柛鏇ㄤ簼椤?\n"
     "#if !defined(_AFXDLL)\r\n"
-    "#include ""l.CHS\\afxribbon.rc""   // MFC 闁告梻鍠曢崗姗€宕犻崫鍕闁硅矇鍐ㄧ厬闁哄銈囥偒婵?\n"
+    "#include ""l.CHS\\afxribbon.rc""   // MFC 闂佸憡姊婚崰鏇㈠礂濮椻偓瀹曠娀宕崟顒€顏梺纭呯焽閸愩劎鍘梺鍝勵棥閵堝洢鍋掑┑?\n"
     "#endif\r\n"
     "#endif\r\n"
     "\0"
@@ -76,6 +76,8 @@ END
 IDR_MAINFRAME           ICON                    "res\\UI.ico"
 
 IDI_CMDSHELL            ICON                    "res\\cmdshell.ico"
+
+IDI_SYSTEM              ICON                    "res\\system.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -122,6 +124,16 @@ CAPTION "Dialog"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     EDITTEXT        IDC_EDIT_SHELL,7,7,601,335,ES_MULTILINE | ES_AUTOHSCROLL | WS_VSCROLL
+END
+
+IDD_DIALOG_SYSTEM DIALOGEX 0, 0, 429, 352
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "系统管理"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_TAB,"SysTabControl32",0x0,7,7,415,64
+    CONTROL         "",IDC_LIST_PROCESS,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,81,406,88
+    CONTROL         "",IDC_LIST_WINDOWS,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,183,404,109
 END
 
 
@@ -203,6 +215,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 342
     END
+
+    IDD_DIALOG_SYSTEM, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 422
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 345
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -252,6 +272,15 @@ BEGIN
         MENUITEM "服务管理",                        IDM_SERVICE
         MENUITEM "注册表管理",                       IDM_REGISTRY
         MENUITEM "断开连接",                        IDM_CLOSE_CONNECT
+    END
+END
+
+IDR_PSLIST MENU
+BEGIN
+    POPUP "PSLIST"
+    BEGIN
+        MENUITEM "结束",                          ID_PSLIST_KILL
+        MENUITEM "刷新",                          ID_PSLIST_REFLESH
     END
 END
 
@@ -309,6 +338,11 @@ BEGIN
     0
 END
 
+IDD_DIALOG_SYSTEM AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -338,10 +372,10 @@ END
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE 4, 2
-#include "res\UI.rc2"  // 闂?Microsoft Visual C++ 缂傛牞绶惃鍕カ濠?
-#include "l.CHS\afxres.rc"      // 閺嶅洤鍣紒鍕
+#include "res\UI.rc2"  // 闂?Microsoft Visual C++ 缂傚倸鍊归悧鐐垫椤愶附鍎嶉柛鏇ㄥ枤閵堫偅绻?
+#include "l.CHS\afxres.rc"      // 闂佸搫绉村ú銈夊闯椤栨粎纾奸柛鏇ㄤ簼椤?
 #if !defined(_AFXDLL)
-#include "l.CHS\afxribbon.rc"   // MFC 閸旂喕鍏橀崠鍝勬嫲閹貉冨煑閺壜ょカ濠?
+#include "l.CHS\afxribbon.rc"   // MFC 闂佸憡姊婚崰鏇㈠礂濮椻偓瀹曠娀宕崟顒€顏梺纭呯焽閸愩劎鍘梺鍝勵棥閵堝洢鍋掑┑?
 #endif
 #endif
 

