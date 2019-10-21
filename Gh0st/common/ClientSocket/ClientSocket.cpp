@@ -346,7 +346,8 @@ void CClientSocket::OnRead( LPBYTE lpBuffer, DWORD dwIoSize )
 				{
 					m_DeCompressionBuffer.ClearBuffer();
 					m_DeCompressionBuffer.Write(pDeCompressionData, destLen);
-					m_pManager->OnReceive(m_DeCompressionBuffer.GetBuffer(0), m_DeCompressionBuffer.GetBufferLen());
+					m_pManager->OnReceive(m_DeCompressionBuffer.GetBuffer(0), 
+										  m_DeCompressionBuffer.GetBufferLen());
 				}
 				else
 					throw "bad buffer";

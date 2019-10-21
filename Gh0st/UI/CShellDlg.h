@@ -35,6 +35,7 @@ private:
 	CIOCPServer		*m_iocpServer;
 	UINT			m_nCurSel;
 	UINT			m_nReceiveLength;
+
 	void			AddKeyBoardData();
 
 public:
