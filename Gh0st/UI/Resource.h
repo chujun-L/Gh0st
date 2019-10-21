@@ -59,8 +59,8 @@
 #define ID_32806                        32806
 #define ID_32807                        32807
 #define ID_32808                        32808
-#define IDM_CMD                         32809
-#define IDM_PROCESS                     32810
+//#define IDM_CMD                         32809
+//#define IDM_PROCESS                     32810
 #define IDM_WINDOW                      32811
 #define IDM_DESKTOP                     32812
 #define IDM_FILE                        32813

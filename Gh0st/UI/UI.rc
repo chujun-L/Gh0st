@@ -127,7 +127,7 @@ BEGIN
 END
 
 IDD_DIALOG_SYSTEM DIALOGEX 0, 0, 429, 352
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "系统管理"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
@@ -263,7 +263,7 @@ BEGIN
     POPUP "点击鼠标右键"
     BEGIN
         MENUITEM "终端管理",                        ID_ONLINE_CMD
-        MENUITEM "进程管理",                        IDM_PROCESS
+        MENUITEM "进程管理",                        ID_ONLINE_PROCESS
         MENUITEM "窗口管理",                        IDM_WINDOW
         MENUITEM "桌面管理",                        IDM_DESKTOP
         MENUITEM "文件管理",                        IDM_FILE

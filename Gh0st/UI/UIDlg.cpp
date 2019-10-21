@@ -332,7 +332,7 @@ BEGIN_MESSAGE_MAP(CUIDlg, CDialogEx)
 	ON_COMMAND(ID_MIAN_CLOSE, &CUIDlg::OnMianClose)
 	ON_NOTIFY(NM_RCLICK, IDC_LIST_ONLINE, &CUIDlg::OnNMRClickListOnline)
 	ON_COMMAND(ID_ONLINE_CMD, &CUIDlg::OnOnlineCmd)
-	ON_COMMAND(IDM_PROCESS, &CUIDlg::OnProcess)
+	ON_COMMAND(ID_ONLINE_PROCESS, &CUIDlg::OnProcess)
 END_MESSAGE_MAP()
 
 
@@ -402,7 +402,7 @@ void CUIDlg::ProcessReceiveComplete(ClientContext *pContext)
 			break;
 
 		case SYSTEM_DLG:
-			//((CSystemDlg *)dlg)->OnReceiveComplete();
+			((CSystemDlg *)dlg)->OnReceiveComplete();
 			break;
 
 		case SHELL_DLG:
