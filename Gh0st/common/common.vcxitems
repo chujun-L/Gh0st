@@ -23,6 +23,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Manager\Manager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)RegEditEx\RegEditEx.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)ShellManager\ShellManager.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)SystemManager\SystemManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Until\until.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -41,6 +42,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Others\Mapper.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)RegEditEx\RegEditEx.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ShellManager\ShellManager.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)SystemManager\SystemManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Until\until.h" />
   </ItemGroup>
 </Project>

