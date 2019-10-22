@@ -95,6 +95,7 @@ enum
 	WM_OPENWEBCAMDIALOG,			// 打开摄像头监视窗口
 	WM_OPENAUDIODIALOG,				// 打开一个语音监听窗口
 	WM_OPENKEYBOARDDIALOG,			// 打开键盘记录窗口
+	WM_OPENWSLISTDIALOG,			// 打开窗口管理窗口
 	WM_OPENPSLISTDIALOG,			// 打开进程管理窗口
 	WM_OPENSHELLDIALOG,				// 打开shell窗口
 	WM_RESETPORT,					// 改变端口

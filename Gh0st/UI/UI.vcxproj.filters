@@ -45,7 +45,10 @@
     <ClInclude Include="CShellDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="CSystemDlg.h">
+    <ClInclude Include="CProcessDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CWindowDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -68,7 +71,10 @@
     <ClCompile Include="CShellDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="CSystemDlg.cpp">
+    <ClCompile Include="CProcessDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CWindowDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

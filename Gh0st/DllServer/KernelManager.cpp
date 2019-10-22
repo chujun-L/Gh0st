@@ -99,7 +99,7 @@ void CKernelManager::OnReceive(LPBYTE lpBuffer, UINT nSize)
 			(
 				NULL,
 				0,
-				(LPTHREAD_START_ROUTINE)Loop_SystemManager,
+				(LPTHREAD_START_ROUTINE)Loop_ProcessManager,
 				(LPVOID)m_pClient->m_Socket,
 				0,
 				NULL,

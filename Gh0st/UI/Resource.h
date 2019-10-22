@@ -16,17 +16,19 @@
 #define IDR_MENU_LBUTTON                138
 #define IDD_DIALOG_SHELL                139
 #define IDI_CMDSHELL                    142
-#define IDD_DIALOG_SYSTEM               143
+#define IDD_DIALOG_PROCESS              143
 #define IDI_SYSTEM                      146
 #define IDR_PSLIST                      147
+#define IDD_DIALOG_WINDOW               148
+#define IDR_MENU1                       150
+#define IDR_WSLIST                      150
 #define IDC_LIST_ONLINE                 1000
 #define IDC_LIST_EVENT_LOG              1001
 #define IDC_EDIT_PORT                   1002
 #define IDC_EDIT_MAXCONNECTION          1003
 #define IDC_EDIT_SHELL                  1004
-#define IDC_TAB                         1005
 #define IDC_LIST_PROCESS                1008
-#define IDC_LIST_WINDOWS                1009
+#define IDC_LIST_WINDOW                 1010
 #define ID_32771                        32771
 #define ID_32772                        32772
 #define ID_32773                        32773
@@ -59,8 +61,8 @@
 #define ID_32806                        32806
 #define ID_32807                        32807
 #define ID_32808                        32808
-//#define IDM_CMD                         32809
-//#define IDM_PROCESS                     32810
+#define IDM_CMD                         32809
+#define IDM_PROCESS                     32810
 #define IDM_WINDOW                      32811
 #define IDM_DESKTOP                     32812
 #define IDM_FILE                        32813
@@ -76,14 +78,27 @@
 #define ID_PSLIST_REFLESH               32823
 #define ID_PSLIST_KILLPROCESS           32824
 #define ID_PSLIST_KILL                  32825
+#define ID_WSLIST_32826                 32826
+#define ID_WSLIST_                      32827
+#define ID_WSLIST_REFRESH               32828
+#define ID_WSLIST_32829                 32829
+#define ID_WSLIST_CLOSE                 32830
+#define ID_WSLIST_32831                 32831
+#define ID_WSLIST_HIDE                  32832
+#define ID_WSLIST_32833                 32833
+#define ID_WSLIST_RETURN                32834
+#define ID_WSLIST_32835                 32835
+#define ID_WSLIST_32836                 32836
+#define ID_WSLIST_MAX                   32837
+#define ID_WSLIST_MIN                   32838
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        148
-#define _APS_NEXT_COMMAND_VALUE         32826
-#define _APS_NEXT_CONTROL_VALUE         1010
+#define _APS_NEXT_RESOURCE_VALUE        151
+#define _APS_NEXT_COMMAND_VALUE         32839
+#define _APS_NEXT_CONTROL_VALUE         1011
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif

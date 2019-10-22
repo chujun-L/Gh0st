@@ -34,6 +34,7 @@ CSystemManager::~CSystemManager()
 {
 
 }
+
 void CSystemManager::OnReceive(LPBYTE lpBuffer, UINT nSize)
 {
 	SwitchInputDesktop();

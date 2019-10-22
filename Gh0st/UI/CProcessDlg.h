@@ -2,11 +2,11 @@
 
 #include "IOCPServer/IOCPServer.h"
 
-// CSystemDlg 对话框
+// CProcessDlg 对话框
 
-class CSystemDlg : public CDialogEx
+class CProcessDlg : public CDialogEx
 {
-	DECLARE_DYNAMIC(CSystemDlg)
+	DECLARE_DYNAMIC(CProcessDlg)
 
 private:
 	HICON			m_hIcon;
@@ -18,30 +18,27 @@ private:
 			void	ShowProcessList();
 
 public:
-	CSystemDlg(CWnd* pParent = nullptr,
+	CProcessDlg(CWnd* pParent = nullptr,
 			   CIOCPServer *pIOCPServer = nullptr,
 		       ClientContext *pContext = nullptr);   // 标准构造函数
 
-	virtual			~CSystemDlg();
+	virtual			~CProcessDlg();
 	virtual BOOL	OnInitDialog();
 
 	afx_msg void	OnSize(UINT nType, int cx, int cy);
 	afx_msg void	OnClose();
-	afx_msg void	OnTcnSelchangeTab(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void	OnPslistKill();
 	afx_msg void	OnPslistReflesh();
 	afx_msg void	OnNMRClickListProcess(NMHDR *pNMHDR, LRESULT *pResult);
 
-	CTabCtrl		m_tab;
 	CListCtrl		m_ListProcess;
-	CListCtrl		m_ListWindows;
 
 			void	OnReceiveComplete();
 	
 
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_DIALOG_SYSTEM };
+	enum { IDD = IDD_DIALOG_PROCESS };
 #endif
 
 protected:

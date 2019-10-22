@@ -121,7 +121,16 @@ bool CClientSocket::Connect(LPCTSTR lpszHost, UINT nPort)
 	}
 
 	m_bIsRunning = true;
-	m_hWorkerThread = (HANDLE)DoCreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)WorkThread, (LPVOID)this, 0, NULL, true);
+	m_hWorkerThread = (HANDLE)DoCreateThread
+			(
+				NULL, 
+				0, 
+				(LPTHREAD_START_ROUTINE)WorkThread, 
+				(LPVOID)this, 
+				0, 
+				NULL, 
+				true
+			);
 
 	return true;
 }
