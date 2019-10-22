@@ -43,8 +43,7 @@ void CShellDlg::AddKeyBoardData()
 
 	strResult.Replace("\n", "\r\n");
 	int	len = m_edit.GetWindowTextLength();
-	// 减去20，是为了去掉返回的命令显示
-	m_edit.SetSel(len - 20, len);
+	m_edit.SetSel(len, len);
 	m_edit.ReplaceSel(strResult);
 	TRACE(strResult);
 	m_nCurSel = m_edit.GetWindowTextLength();

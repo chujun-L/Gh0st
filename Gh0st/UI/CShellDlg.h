@@ -12,14 +12,13 @@ public:
 	CShellDlg(CWnd* pParent = nullptr,
 			CIOCPServer *pIOCPServer = nullptr,
 			ClientContext *pContext = nullptr);   // 标准构造函数
-	virtual ~CShellDlg();
 
-	CEdit			m_edit;
-
-	void			OnReceiveComplete();
-
+	virtual			~CShellDlg();
 	virtual BOOL	OnInitDialog();
 	virtual BOOL	PreTranslateMessage(MSG *pMsg);
+			void	OnReceiveComplete();
+
+			CEdit	m_edit;
 
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
@@ -36,7 +35,7 @@ private:
 	UINT			m_nCurSel;
 	UINT			m_nReceiveLength;
 
-	void			AddKeyBoardData();
+			void	AddKeyBoardData();
 
 public:
 	afx_msg void	OnEnChangeEditShell();
