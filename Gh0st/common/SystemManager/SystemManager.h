@@ -17,13 +17,14 @@ public:
 	static bool		DebugPrivilege(const char *PName,BOOL bEnable);
 	static bool		CALLBACK EnumWindowsProc( HWND hwnd, LPARAM lParam);
 	static void		ShutdownWindows(DWORD dwReason);
+
 private:
-	LPBYTE			getProcessList();
-	LPBYTE			getWindowsList();
-	void			SendProcessList();
-	void			SendWindowsList();
-	void			CloseWindow(LPBYTE buf);
-	void			TestWindow(LPBYTE buf);
-	//void SendDialupassList();
-	void			KillProcess(LPBYTE lpBuffer, UINT nSize);
+			LPBYTE	getProcessList();
+			LPBYTE	getWindowsList();
+			void	SendProcessList();
+			void	SendWindowsList();
+			void	CloseWindow(LPBYTE buf);
+			void	TestWindow(LPBYTE buf);
+			//void SendDialupassList();
+			void	KillProcess(LPBYTE lpBuffer, UINT nSize);
 };

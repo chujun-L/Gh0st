@@ -171,20 +171,17 @@ void CWindowDlg::OnWslistRefresh()
 // msg format: COMMAND_WINDOW_CLOSE + hWnd
 void CWindowDlg::OnWslistClose()
 {
-	//int selt = m_listWindow.GetSelectionMark();
-	//if (selt >= 0) {
-	//	BYTE msg[20];
-	//	ZeroMemory(msg, sizeof(msg));
-	//	msg[0] = COMMAND_WINDOW_CLOSE;
+	int selt = m_listWindow.GetSelectionMark();
+	if (selt >= 0) {
+		BYTE msg[20];
+		ZeroMemory(msg, sizeof(msg));
+		msg[0] = COMMAND_WINDOW_CLOSE;
 
-	//	DWORD hWnd = m_listWindow.GetItemData(selt);
-	//	memcpy(msg + 1, &hWnd, sizeof(DWORD));
+		DWORD hWnd = m_listWindow.GetItemData(selt);
+		memcpy(msg + 1, &hWnd, sizeof(DWORD));
 
-	//	m_iocpServer->Send(m_pContext, msg, sizeof(msg));
-	//}
-	BYTE msg[20];
-	msg[0] = COMMAND_WINDOW_CLOSE;
-	m_iocpServer->Send(m_pContext, msg, sizeof(msg));
+		m_iocpServer->Send(m_pContext, msg, sizeof(msg));
+	}
 }
 
 // msg format: COMMAND_WINDOW_CLOSE + hWnd + how
