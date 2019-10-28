@@ -5,6 +5,7 @@
 #include "IOCPServer/IOCPServer.h"
 #include "lib/zlib/zlib.h"
 
+
 #ifdef _DEBUG
 #undef THIS_FILE
 static char THIS_FILE[]=__FILE__;
@@ -43,27 +44,31 @@ CRITICAL_SECTION CIOCPServer::m_cs;
 ////////////////////////////////////////////////////////////////////////////////
 
 //lang2.1_4
-CIOCPServer::CIOCPServer()     //简单分析CIOCPServer类 套接字数据处理的类
+CIOCPServer::CIOCPServer()
 {
+	m_bTimeToKill = false;
+	m_nCurrentThreads = 0;
+	m_nBusyThreads = 0;
+
 	m_pNotifyProc			= nullptr;
 	m_pFrame				= nullptr;
-	m_nCurrentThreads		= 0;
-	m_nBusyThreads			= 0;
+	
+	
 	m_nSendKbps				= 0;
 	m_nRecvKbps				= 0;
 	m_nMaxConnections		= 10000;
-	m_nWorkerCnt			= 0;
+	m_nWorkerThreadCnt			= 0;
 	m_bInit					= 0;
 	m_bDisconnectAll		= 0;
 
 	// Packet Flag;
-	BYTE bPacketFlag[] = { 'G', 'h', '0', 's', 't' };           //这里是数据发送的标记  服务端同客户端字符必须一致
+	BYTE bPacketFlag[] = { 'G', 'h', '0', 's', 't' }; 
 	memcpy(m_bPacketFlag, bPacketFlag, sizeof(bPacketFlag));
 
 	m_hEvent				= nullptr;
 	m_socListen				= 0;
 	m_hCompletionPort		= nullptr;
-	m_bTimeToKill			= 0;
+	
 	m_nKeepLiveTime			= 1000 * 60 * 3; // 三分钟探测一次
 	m_nThreadPoolMin		= 0;
 	m_nThreadPoolMax		= 0;
@@ -135,21 +140,25 @@ CIOCPServer::~CIOCPServer()
 
 bool CIOCPServer::Initialize(NOTIFYPROC pNotifyProc, CMainFrame* pFrame, int nMaxConnections, int nPort)
 {
-	m_pNotifyProc	= pNotifyProc;
-	m_pFrame		=  pFrame;
-	m_nMaxConnections = nMaxConnections;
-	m_socListen = WSASocketW(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+	// 保存回调函数的指针
+	m_pNotifyProc = pNotifyProc;
 
-    //初始化 套接字
-	if (m_socListen == INVALID_SOCKET){
-		TRACE(_T("Could not create listen socket %ld\n"),WSAGetLastError());
+	m_pFrame = pFrame;
+	m_nMaxConnections = nMaxConnections;
+
+	// Create WSASocket with overlapped
+	m_socListen = WSASocketW(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+	if (m_socListen == INVALID_SOCKET)
+	{
+		TRACE(_T("Could not create listen socket %ld\n"), WSAGetLastError());
 		return false;
 	}
 
 	// Event for handling Network IO
 	m_hEvent = WSACreateEvent();
-	if (m_hEvent == WSA_INVALID_EVENT){
-		TRACE(_T("WSACreateEvent() error %ld\n"),WSAGetLastError());
+	if (m_hEvent == WSA_INVALID_EVENT)
+	{
+		TRACE(_T("WSACreateEvent() error %ld\n"), WSAGetLastError());
 		closesocket(m_socListen);
 		return false;
 	}
@@ -175,7 +184,7 @@ bool CIOCPServer::Initialize(NOTIFYPROC pNotifyProc, CMainFrame* pFrame, int nMa
 	// bind our name to the socket
 	nRet = bind(m_socListen, (LPSOCKADDR)&saServer, sizeof(struct sockaddr));
 	if (nRet == SOCKET_ERROR) {
-		TRACE(_T("bind() error %ld\n"),WSAGetLastError());
+		TRACE(_T("bind() error %ld\n"), WSAGetLastError());
 		closesocket(m_socListen);
 		return false;
 	}
@@ -183,22 +192,24 @@ bool CIOCPServer::Initialize(NOTIFYPROC pNotifyProc, CMainFrame* pFrame, int nMa
 	// Set the socket to listen
 	nRet = listen(m_socListen, SOMAXCONN);
 	if (nRet == SOCKET_ERROR){
-		TRACE(_T("listen() error %ld\n"),WSAGetLastError());
+		TRACE(_T("listen() error %ld\n"), WSAGetLastError());
 		closesocket(m_socListen);
 		return false;
 	}
 
 
 	UINT	dwThreadId = 0;
-    //开启监听线程  跟进ListenThreadProc
-	m_hThread = (HANDLE)_beginthreadex(NULL,				// Security
-									   0,					// Stack size - use default
-									   ListenThreadProc,    // Thread fn entry point
-									   (void*) this,	    
-									   0,					// Init flag
-									   &dwThreadId);	    // Thread address
+	m_hThread = (HANDLE)_beginthreadex(
+		NULL,				// Security
+		0,					// Stack size - use default
+		ListenThreadProc,   // Thread fn entry point
+		(void*) this,	    
+		0,					// Init flag
+		&dwThreadId			// Thread address
+	);	    
 
-	if (m_hThread != INVALID_HANDLE_VALUE) {
+	if (m_hThread != INVALID_HANDLE_VALUE)
+	{
 		InitializeIOCP();
 		m_bInit = true;
 		return true;
@@ -225,36 +236,45 @@ bool CIOCPServer::Initialize(NOTIFYPROC pNotifyProc, CMainFrame* pFrame, int nMa
 // 
 ////////////////////////////////////////////////////////////////////////////////
  
-unsigned CIOCPServer::ListenThreadProc(LPVOID lParam)   //监听线程
+unsigned CIOCPServer::ListenThreadProc(LPVOID lParam)
 {
+	TRACE("ListenThreadProc()\n");
 	CIOCPServer *pThis = reinterpret_cast<CIOCPServer *>(lParam);
 
 	WSANETWORKEVENTS events;
 	
-	while(1) {
+	while(1) 
+	{
 		// Wait for something to happen
-		if (WaitForSingleObject(pThis->m_hKillEvent, 100) == WAIT_OBJECT_0) {
+		if (WaitForSingleObject(pThis->m_hKillEvent, 100)
+			== WAIT_OBJECT_0)
+		{
 			break;
 		}
 
-		DWORD dwRet = WSAWaitForMultipleEvents(1, &pThis->m_hEvent, FALSE, 100, FALSE);
-		if (dwRet == WSA_WAIT_TIMEOUT) {
+		if (WSAWaitForMultipleEvents(1, &pThis->m_hEvent, FALSE, 100, FALSE)
+			== WSA_WAIT_TIMEOUT)
+		{
 			continue;
 		}
 
 		// Figure out what happened
-		int nRet = WSAEnumNetworkEvents(pThis->m_socListen, pThis->m_hEvent, &events);
-		if (nRet == SOCKET_ERROR) {
-			TRACE(_T("WSAEnumNetworkEvents error %ld\n"),WSAGetLastError());
+		if (WSAEnumNetworkEvents(pThis->m_socListen, pThis->m_hEvent, &events)
+			== SOCKET_ERROR)
+		{
+			TRACE(_T("WSAEnumNetworkEvents error %ld\n"), WSAGetLastError());
 			break;
 		}
 
 		// Handle Network events //
 		// ACCEPT
 		if (events.lNetworkEvents & FD_ACCEPT) {
-			if (events.iErrorCode[FD_ACCEPT_BIT] == 0) {
+			if (events.iErrorCode[FD_ACCEPT_BIT] == 0) 
+			{
 				pThis->OnAccept();
-			} else {
+			} 
+			else 
+			{
 				TRACE(_T("Unknown network event error %ld\n"),WSAGetLastError());
 				break;
 			}
@@ -288,16 +308,17 @@ void CIOCPServer::OnAccept()
 	SOCKADDR_IN	SockAddr;
 	SOCKET		clientSocket;
 
-	if (m_bTimeToKill || m_bDisconnectAll) {
+	if (m_bTimeToKill || m_bDisconnectAll)
 		return;
-	}	
 
 	// accept the new socket descriptor
 	int nLen = sizeof(SOCKADDR_IN);
 	clientSocket = accept(m_socListen, (LPSOCKADDR)&SockAddr, &nLen); 
-	if (clientSocket == SOCKET_ERROR) {
+	if (clientSocket == SOCKET_ERROR) 
+	{
 		int nErCode = WSAGetLastError();
-		if (nErCode != WSAEWOULDBLOCK) {
+		if (nErCode != WSAEWOULDBLOCK) 
+		{
 			// Just log the error and return
 			TRACE(_T("accept() error code %d\n"), nErCode);
 			return;
@@ -305,10 +326,9 @@ void CIOCPServer::OnAccept()
 	}
 
 	// Create the Client context to be associted with the completion port
-	ClientContext* pContext = AllocateContext();
-	if (pContext == NULL) {
+	ClientContext *pContext = AllocateContext();
+	if (pContext == NULL)
 		return;
-	}
 
     pContext->m_Socket = clientSocket;
 	// Fix up In Buffer
@@ -316,9 +336,11 @@ void CIOCPServer::OnAccept()
 	pContext->m_wsaInBuffer.len = sizeof(pContext->m_byInBuffer);
 
    // Associate the new socket with a completion port.
-	if (!AssociateSocketWithCompletionPort(clientSocket, 
-										   m_hCompletionPort, 
-										   (DWORD)pContext)) {
+	if (!AssociateSocketWithCompletionPort(
+		clientSocket, 					   
+		m_hCompletionPort, 
+		(DWORD)pContext))
+	{
         delete pContext;
 		pContext = NULL;
 
@@ -368,15 +390,19 @@ void CIOCPServer::OnAccept()
 
 	OVERLAPPEDPLUS	*pOverlap = new OVERLAPPEDPLUS(IOInitialize);
 
-	BOOL bSuccess = PostQueuedCompletionStatus(m_hCompletionPort, 0, (DWORD) pContext, &pOverlap->m_ol);
+	BOOL bSuccess = PostQueuedCompletionStatus(
+		m_hCompletionPort, 
+		0, 
+		(DWORD)pContext, 
+		&pOverlap->m_ol);
 	
-	if ( (!bSuccess && GetLastError( ) != ERROR_IO_PENDING))
+	if ((!bSuccess && GetLastError() != ERROR_IO_PENDING))
 	{            
         RemoveStaleClient(pContext,TRUE);
 	    return;
     }
 
-	// 回调函数处理
+	// 通知UI，有肉机连接
 	m_pNotifyProc((LPVOID) m_pFrame, pContext, NC_CLIENT_CONNECT);
 
 	// Post to WSARecv Next
@@ -384,45 +410,20 @@ void CIOCPServer::OnAccept()
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-// 
-// FUNCTION:	CIOCPServer::InitializeIOCP
-// 
-// DESCRIPTION:	Create a dummy socket and associate a completion port with it.
-//				once completion port is create we can dicard the socket
-// 
-// INPUTS:		
-// 
-// NOTES:	
-// 
-// MODIFICATIONS:
-// 
-// Name                  Date       Version    Comments
-// N T ALMOND            06042001	1.0        Origin
-// 
-////////////////////////////////////////////////////////////////////////////////
 bool CIOCPServer::InitializeIOCP(void)
 {
-
-    SOCKET s;
-    DWORD i;
-    UINT  nThreadID;
-    SYSTEM_INFO systemInfo;
-
-    //
+	TRACE("InitializeIOCP()\n");
     // First open a temporary socket that we will use to create the
     // completion port.  In NT 3.51 it will not be necessary to specify
     // the FileHandle parameter of CreateIoCompletionPort()--it will
     // be legal to specify FileHandle as NULL.  However, for NT 3.5
     // we need an overlapped file handle.
-    //
 
-    s = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
+	SOCKET s = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
     if ( s == INVALID_SOCKET ) 
         return false;
 
-    // Create the completion port that will be used by all the worker
-    // threads.
+    // Create the completion port that will be used by all the worker threads.
     m_hCompletionPort = CreateIoCompletionPort( (HANDLE)s, NULL, 0, 0 );
     if ( m_hCompletionPort == NULL ) 
 	{
@@ -434,6 +435,7 @@ bool CIOCPServer::InitializeIOCP(void)
     closesocket( s );
 
     // Determine how many processors are on the system.
+	SYSTEM_INFO systemInfo;
     GetSystemInfo( &systemInfo );
 
 	m_nThreadPoolMin  = systemInfo.dwNumberOfProcessors * HUERISTIC_VALUE;
@@ -443,33 +445,35 @@ bool CIOCPServer::InitializeIOCP(void)
 
 	m_cpu.Init();
 
+    // We use two worker threads for eachprocessor on the system--this is 
+	// choosen as a good balance that ensures that there are a sufficient
+	// number of threads available to get useful work done but not too many
+	// that context switches consume significant overhead.
+	UINT nWorkerThreadCnt = systemInfo.dwNumberOfProcessors * HUERISTIC_VALUE;
 
-    // We use two worker threads for eachprocessor on the system--this is choosen as a good balance
-    // that ensures that there are a sufficient number of threads available to get useful work done 
-	// but not too many that context switches consume significant overhead.
-	UINT nWorkerCnt = systemInfo.dwNumberOfProcessors * HUERISTIC_VALUE;
 
 	// We need to save the Handles for Later Termination...
-	HANDLE hWorker;
-	m_nWorkerCnt = 0;
+	HANDLE hWorker = nullptr;
+	m_nWorkerThreadCnt = 0;
+	UINT nThreadID;
 
-    for ( i = 0; i < nWorkerCnt; i++ ) 
+    for ( UINT i = 0; i < nWorkerThreadCnt; i++ )
 	{
-		hWorker = (HANDLE)_beginthreadex(NULL,					// Security
-										0,						// Stack size - use default
-										ThreadPoolFunc,     		// Thread fn entry point
-										(void*) this,			// Param for thread
-										0,						// Init flag
-										&nThreadID);			// Thread address
+		hWorker = (HANDLE)_beginthreadex(
+			NULL,			// Security
+			0,				// Stack size - use default
+			ThreadPoolFunc, // Thread fn entry point
+			(void*) this,	// Param for thread
+			0,				// Init flag
+			&nThreadID);	// Thread address
 
-
-        if (hWorker == NULL ) 
+        if (hWorker == NULL) 
 		{
             CloseHandle( m_hCompletionPort );
             return false;
         }
 
-		m_nWorkerCnt++;
+		m_nWorkerThreadCnt++;
 
 		CloseHandle(hWorker);
     }
@@ -477,70 +481,50 @@ bool CIOCPServer::InitializeIOCP(void)
 	return true;
 } 
 
-////////////////////////////////////////////////////////////////////////////////
-// 
-// FUNCTION:	CIOCPServer::ThreadPoolFunc 
-// 
-// DESCRIPTION:	This is the main worker routine for the worker threads.  
-//				Worker threads wait on a completion port for I/O to complete.  
-//				When it completes, the worker thread processes the I/O, then either pends 
-//				new I/O or closes the client's connection.  When the service shuts 
-//				down, other code closes the completion port which causes 
-//				GetQueuedCompletionStatus() to wake up and the worker thread then 
-//				exits.
-// 
-// INPUTS:		
-// 
-// NOTES:	
-// 
-// MODIFICATIONS:
-// 
-// Name                  Date       Version    Comments
-// N T ALMOND            06042001	1.0        Origin
-// Ulf Hedlund			 09062001              Changes for OVERLAPPEDPLUS
-////////////////////////////////////////////////////////////////////////////////
+
+
+// DESCRIPTION:
+//	This is the main worker routine for the worker threads.  
+//	Worker threads wait on a completion port for I/O to complete.  
+//	When it completes, the worker thread processes the I/O, then either pends 
+//	new I/O or closes the client's connection.  When the service shuts 
+//	down, other code closes the completion port which causes 
+//	GetQueuedCompletionStatus() to wake up and the worker thread then exits.
+
 unsigned CIOCPServer::ThreadPoolFunc (LPVOID thisContext)    
 {
 	// Get back our pointer to the class
 	ULONG ulFlags = MSG_PARTIAL;
-	CIOCPServer* pThis = reinterpret_cast<CIOCPServer*>(thisContext);
-	//ASSERT(pThis);
-	if (pThis == nullptr) {
+	CIOCPServer *pThis = reinterpret_cast<CIOCPServer *>(thisContext);
+	ASSERT(pThis);
+	if (!pThis)
 		return 1;
-	}
 
 	HANDLE hCompletionPort = pThis->m_hCompletionPort;
     
     DWORD dwIoSize;
     LPOVERLAPPED lpOverlapped;
-    ClientContext* lpClientContext;
-	OVERLAPPEDPLUS*	pOverlapPlus;
-	bool			bError;
-	bool			bEnterRead;
+    ClientContext *lpClientContext = nullptr;
+	OVERLAPPEDPLUS *pOverlapPlus = nullptr;
+	bool bError = false;
+	bool bEnterRead = false;
 
 	InterlockedIncrement(&pThis->m_nCurrentThreads);
 	InterlockedIncrement(&pThis->m_nBusyThreads);
 
-	//
     // Loop round and round servicing I/O completions.
-	// 
-
 	for (BOOL bStayInPool = TRUE; bStayInPool && pThis->m_bTimeToKill == false; ) 
 	{
-		pOverlapPlus	= NULL;
-		lpClientContext = NULL;
-		bError			= false;
-		bEnterRead		= false;
 		// Thread is Block waiting for IO completion
 		InterlockedDecrement(&pThis->m_nBusyThreads);
 
-
 		// Get a completed IO request.
 		BOOL bIORet = GetQueuedCompletionStatus(
-               hCompletionPort,
-               &dwIoSize,
-               (LPDWORD) &lpClientContext,
-               &lpOverlapped, INFINITE);
+			hCompletionPort,
+			&dwIoSize,
+			(LPDWORD) &lpClientContext,
+			&lpOverlapped,
+			INFINITE);
 
 		DWORD dwIOError = GetLastError();
 		pOverlapPlus = CONTAINING_RECORD(lpOverlapped, OVERLAPPEDPLUS, m_ol);
@@ -562,7 +546,6 @@ unsigned CIOCPServer::ThreadPoolFunc (LPVOID thisContext)
 		
 		if (!bError) 
 		{
-			
 			// Allocate another thread to the thread Pool?
 			if (nBusyThreads == pThis->m_nCurrentThreads)
 			{
@@ -572,18 +555,18 @@ unsigned CIOCPServer::ThreadPoolFunc (LPVOID thisContext)
 					{
 						UINT nThreadID = -1;
 
-//						HANDLE hThread = (HANDLE)_beginthreadex(NULL,				// Security
-//											 0,					// Stack size - use default
-//											 ThreadPoolFunc,  // Thread fn entry point
-///											 (void*) pThis,	    
-//											 0,					// Init flag
-//											 &nThreadID);	// Thread address
+						//HANDLE hThread = (HANDLE)_beginthreadex(
+						//	NULL,			// Security
+						//	0,				// Stack size - use default
+						//	ThreadPoolFunc, // Thread fn entry point
+						//	(void*) pThis,	    
+						//	0,				// Init flag
+						//	&nThreadID);	// Thread address
 
-//						CloseHandle(hThread);
+						//CloseHandle(hThread);
 					}
 				}
 			}
-
 
 			// Thread timed out - IDLE?
 			if (!bIORet && dwIOError == WAIT_TIMEOUT)
@@ -601,12 +584,17 @@ unsigned CIOCPServer::ThreadPoolFunc (LPVOID thisContext)
 				}
 			}
 		}
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
+
+		////////////////////////////////////////////////////////////////
 		if (!bError)
 		{
 			if(bIORet && NULL != pOverlapPlus && NULL != lpClientContext) 
 			{
+				TRACE("pID: %d  tID: %d m_ioType: %d\n", 
+					GetCurrentProcessId(), 
+					GetCurrentThreadId(), 
+					pOverlapPlus->m_ioType);
+
 				try
 				{
 					pThis->ProcessIOMessage(pOverlapPlus->m_ioType, lpClientContext, dwIoSize);
@@ -619,11 +607,11 @@ unsigned CIOCPServer::ThreadPoolFunc (LPVOID thisContext)
 			delete pOverlapPlus; // from previous call
     }
 
-	InterlockedDecrement(&pThis->m_nWorkerCnt);
-
+	//InterlockedDecrement(&pThis->m_nWorkerThreadCnt);
 	InterlockedDecrement(&pThis->m_nCurrentThreads);
 	InterlockedDecrement(&pThis->m_nBusyThreads);
-   	return 0;
+   	
+	return 0;
 } 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -696,6 +684,9 @@ void CIOCPServer::PostRecv(ClientContext* pContext)
 		&ulFlags,
 		&pOverlap->m_ol, 
 		NULL);
+
+	TRACE("pID->%d, tID->%d, PostRecv() m_wsaInBuffer: %s\n", 
+		GetCurrentProcessId(), GetCurrentThreadId(),  pContext->m_wsaInBuffer.buf);
 	
 	if ( nRetVal == SOCKET_ERROR && WSAGetLastError() != WSA_IO_PENDING) 
 	{
@@ -801,6 +792,7 @@ bool CIOCPServer::OnClientInitializing(ClientContext* pContext, DWORD dwIoSize)
 	return true;		// make sure to issue a read after this
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // 
 // FUNCTION:	CIOCPServer::OnClientReading
@@ -826,20 +818,25 @@ bool CIOCPServer::OnClientReading(ClientContext* pContext, DWORD dwIoSize)
 		static DWORD nBytes = 0;
 		nBytes += dwIoSize;
 		
-		if (GetTickCount64() - nLastTick >= 1000) {
+		if (GetTickCount64() - nLastTick >= 1000)
+		{
 			nLastTick = GetTickCount64();
 			InterlockedExchange((LPLONG)&(m_nRecvKbps), nBytes);
 			nBytes = 0;
 		}
 
-		if (dwIoSize == 0) {
+		if (dwIoSize == 0)
+		{
 			RemoveStaleClient(pContext, FALSE);
 			return false;
 		}
 
-		if (dwIoSize == FLAG_SIZE && memcmp(pContext->m_byInBuffer, m_bPacketFlag, FLAG_SIZE) == 0) {
+		if (dwIoSize == FLAG_SIZE && 
+			memcmp(pContext->m_byInBuffer, m_bPacketFlag, FLAG_SIZE) == 0) 
+		{
 			// 重新发送
-			Send(pContext, pContext->m_ResendWriteBuffer.GetBuffer(), pContext->m_ResendWriteBuffer.GetBufferLen());
+			Send(pContext, pContext->m_ResendWriteBuffer.GetBuffer(), 
+				pContext->m_ResendWriteBuffer.GetBufferLen());
 			// 必须再投递一个接收请求
 			PostRecv(pContext);
 			return true;
@@ -853,24 +850,28 @@ bool CIOCPServer::OnClientReading(ClientContext* pContext, DWORD dwIoSize)
 
 
 		// Check real Data
-		while (pContext->m_CompressionBuffer.GetBufferLen() > HDR_SIZE) {
+		while (pContext->m_CompressionBuffer.GetBufferLen() > HDR_SIZE) 
+		{
 			BYTE bPacketFlag[FLAG_SIZE];
-			CopyMemory(bPacketFlag, pContext->m_CompressionBuffer.GetBuffer(), sizeof(bPacketFlag));
+			CopyMemory(bPacketFlag, pContext->m_CompressionBuffer.GetBuffer(), 
+				sizeof(bPacketFlag));
 
 			if (memcmp(m_bPacketFlag, bPacketFlag, sizeof(m_bPacketFlag)) != 0)
 				throw "bad buffer";
 
 			UINT nSize = 0;
-			CopyMemory(&nSize, pContext->m_CompressionBuffer.GetBuffer(FLAG_SIZE), sizeof(int));
+			CopyMemory(&nSize, pContext->m_CompressionBuffer.GetBuffer(FLAG_SIZE), 
+				sizeof(int));
 			
 			// Update Process Variable
-			pContext->m_nTransferProgress = pContext->m_CompressionBuffer.GetBufferLen() * 100 / nSize;
+			int nlen = pContext->m_CompressionBuffer.GetBufferLen();
+			pContext->m_nTransferProgress = nlen * 100 / nSize;
 
-			if (nSize && (pContext->m_CompressionBuffer.GetBufferLen()) >= nSize) {
+			if (nSize && (pContext->m_CompressionBuffer.GetBufferLen()) >= nSize) 
+			{
 				int nUnCompressLength = 0;
 				// Read off header
 				pContext->m_CompressionBuffer.Read((PBYTE) bPacketFlag, sizeof(bPacketFlag));
-
 				pContext->m_CompressionBuffer.Read((PBYTE) &nSize, sizeof(int));
 				pContext->m_CompressionBuffer.Read((PBYTE) &nUnCompressLength, sizeof(int));
 				
@@ -890,19 +891,24 @@ bool CIOCPServer::OnClientReading(ClientContext* pContext, DWORD dwIoSize)
 				unsigned long	destLen = nUnCompressLength;
 				int	nRet = uncompress(pDeCompressionData, &destLen, pData, nCompressLength);
 				//////////////////////////////////////////////////////////////////////////
-				if (nRet == Z_OK) {
+				if (nRet == Z_OK) 
+				{
 					pContext->m_DeCompressionBuffer.ClearBuffer();
 					pContext->m_DeCompressionBuffer.Write(pDeCompressionData, destLen);
 					// notify 
 					m_pNotifyProc((LPVOID) m_pFrame, pContext, NC_RECEIVE_COMPLETE);
-				} else {
+				} 
+				else 
+				{
 					throw "bad buffer";
 				}
 
 				delete [] pData;
 				delete [] pDeCompressionData;
 				pContext->m_nMsgIn++;
-			} else {
+			} 
+			else 
+			{
 				break;
 			}
 				
@@ -1014,7 +1020,7 @@ bool CIOCPServer::OnClientWriting(ClientContext* pContext, DWORD dwIoSize)
 void CIOCPServer::CloseCompletionPort()
 {
 
-	while (m_nWorkerCnt)
+	while (m_nWorkerThreadCnt)
 	{
 		PostQueuedCompletionStatus(m_hCompletionPort, 0, (DWORD) NULL, NULL);
 		Sleep(100);

@@ -3,11 +3,11 @@
 
 //#define net_msg
 
-class __declspec(novtable) CIOMessageMap
-{
-public:
-	virtual bool ProcessIOMessage(IOType clientIO, ClientContext* pContext, DWORD dwSize) = 0;
-};
+//class __declspec(novtable) CIOMessageMap
+//{
+//public:
+//	virtual bool ProcessIOMessage(IOType clientIO, ClientContext* pContext, DWORD dwSize) = 0;
+//};
 
 #define BEGIN_IO_MSG_MAP() \
 public: \

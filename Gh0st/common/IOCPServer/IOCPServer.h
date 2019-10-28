@@ -65,6 +65,7 @@ public:
 	OVERLAPPED			m_ol;
 	IOType				m_ioType;
 
+	// 构造函数
 	OVERLAPPEDPLUS(IOType ioType) {
 		ZeroMemory(this, sizeof(OVERLAPPEDPLUS));
 		m_ioType = ioType;
@@ -127,10 +128,18 @@ public:
 	CIOCPServer();
 	virtual ~CIOCPServer();
 
-	NOTIFYPROC			m_pNotifyProc;
-	CMainFrame*			m_pFrame;
+	// 线程原子操作
+	LONG m_nCurrentThreads;
+	LONG m_nBusyThreads;
+
+	NOTIFYPROC m_pNotifyProc;
+	CMainFrame *m_pFrame;
+
+	UINT m_nMaxConnections;
 	
-	bool Initialize(NOTIFYPROC pNotifyProc, CMainFrame* pFrame,  int nMaxConnections, int nPort);
+	// 网络的初始化
+	bool Initialize(NOTIFYPROC pNotifyProc, CMainFrame *pFrame,
+		int nMaxConnections, int nPort);
 
 	static unsigned __stdcall ListenThreadProc(LPVOID lpVoid);
 	static unsigned __stdcall ThreadPoolFunc(LPVOID WorkContext);
@@ -144,47 +153,66 @@ public:
 	void ResetConnection(ClientContext* pContext);
 	void DisconnectAll();
 	
-	LONG				m_nCurrentThreads;
-	LONG				m_nBusyThreads;
+
 
 	
 	UINT				m_nSendKbps; // 发送即时速度
 	UINT				m_nRecvKbps; // 接受即时速度
-	UINT				m_nMaxConnections; // 最大连接数
+	
+
 protected:
+	// Thread Pool Tunables
+	LONG m_nThreadPoolMin;
+	LONG m_nThreadPoolMax;
+	// cpu usage rate
+	CCpuUsage m_cpu;
+	LONG m_nCPULoThreshold;
+	LONG m_nCPUHiThreshold;
+
+	LONG m_nWorkerThreadCnt;
+	
+	bool m_bTimeToKill;
+
+	// Initialize()
+	HANDLE m_hKillEvent;  // 在构造函数创建事件
+	HANDLE m_hThread;
+	WSAEVENT m_hEvent;
+	
+	// IOCP
+	HANDLE m_hCompletionPort;
+
+	bool InitializeIOCP(void);
+
+
 	void InitializeClientRead(ClientContext* pContext);
 	BOOL AssociateSocketWithCompletionPort(SOCKET device, HANDLE hCompletionPort, DWORD dwCompletionKey);
 	void RemoveStaleClient(ClientContext* pContext, BOOL bGraceful);
 	void MoveToFreePool(ClientContext *pContext);
 	ClientContext*  AllocateContext();
 
-	LONG				m_nWorkerCnt;
+	
 
 	bool				m_bInit;
 	bool				m_bDisconnectAll;
 	BYTE				m_bPacketFlag[5];
 	void CloseCompletionPort();
 	void OnAccept();
-	bool InitializeIOCP(void);
+	
 	void Stop();
 
 	ContextList			m_listContexts;
 	ContextList			m_listFreePool;
-	WSAEVENT			m_hEvent;
+	
 	SOCKET				m_socListen;    
-    HANDLE				m_hKillEvent;
-	HANDLE				m_hThread;
-	HANDLE				m_hCompletionPort;
-	bool				m_bTimeToKill;
-	CCpuUsage			m_cpu;
+    
+	
+	
+	
+	
 
 	LONG				m_nKeepLiveTime; // 心跳超时
 
-	// Thread Pool Tunables
-	LONG				m_nThreadPoolMin;
-	LONG				m_nThreadPoolMax;
-	LONG				m_nCPULoThreshold;
-	LONG				m_nCPUHiThreshold;
+
 
 
 	CString GetHostName(SOCKET socket);

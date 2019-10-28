@@ -1,5 +1,5 @@
 // CpuUsage.h: interface for the CCpuUsage class.
-//
+// Performance Data Helper （PDH），性能数据助手
 
 #pragma once
 
@@ -28,13 +28,10 @@ class CCpuUsage
 public:
 	CCpuUsage();
 	virtual ~CCpuUsage();
-	BOOL	Init();
+	BOOL Init();
 	int GetUsage();
 
 protected:
-
-	PPDHCOUNTERSTRUCT			m_pCounterStruct;
-	HQUERY						m_hQuery;
-
-
+	PPDHCOUNTERSTRUCT m_pCounterStruct;
+	HQUERY m_hQuery;
 };

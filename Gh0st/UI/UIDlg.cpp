@@ -294,6 +294,7 @@ void CUIDlg::StartNetwork()
 	 * NotifyProc(): 该回调函数accpet网络的连接
 	 */
 	std::initializer_list<LPCTSTR> columns;
+
 	if (g_iocpServer->Initialize(NotifyProc, NULL, 10000, nPort)) {
 		char IPList[MAX_PATH] = {0}; 
 		GetLocalIPList(IPList);
@@ -357,10 +358,14 @@ void CUIDlg::NotifyProc(LPVOID lpParam, ClientContext *pContext, UINT nCode)
 			break;
 
 		case NC_RECEIVE:
+			TRACE("pID->%d, tID->%d, NotifyProc() NC_RECEIVE\n",
+				GetCurrentProcessId(), GetCurrentThreadId());
 			// todo
 			break;
 
 		case NC_RECEIVE_COMPLETE:
+			TRACE("pID->%d, tID->%d, NotifyProc() NC_RECEIVE_COMPLETE\n",
+				GetCurrentProcessId(), GetCurrentThreadId());
 			ProcessReceiveComplete(pContext);
 			break;
 		}

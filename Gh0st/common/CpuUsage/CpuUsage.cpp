@@ -1,10 +1,8 @@
 // CpuUsage.cpp: implementation of the CCpuUsage class.
 //
-//////////////////////////////////////////////////////////////////////
 
 #include "pch.h"
 #include "CpuUsage.h"
-
 
 
 CCpuUsage::CCpuUsage()
@@ -12,6 +10,7 @@ CCpuUsage::CCpuUsage()
 	m_hQuery = NULL;
 	m_pCounterStruct = NULL;
 }
+
 
 CCpuUsage::~CCpuUsage()
 {
@@ -27,13 +26,10 @@ BOOL CCpuUsage::Init()
 
     m_pCounterStruct = (PPDHCOUNTERSTRUCT) new PDHCOUNTERSTRUCT;
 
-	PDH_STATUS pdh_status = PdhAddCounter(m_hQuery, (PCSTR)szCounterName, (DWORD) m_pCounterStruct, &(m_pCounterStruct->hCounter));
+	PDH_STATUS pdh_status = PdhAddCounter(m_hQuery, (PCSTR)szCounterName,
+		(DWORD) m_pCounterStruct, &(m_pCounterStruct->hCounter));
     if (ERROR_SUCCESS != pdh_status) 
-	{
 		return FALSE;
-	}
-
-
 
 	return TRUE;
 }
@@ -46,12 +42,7 @@ int CCpuUsage::GetUsage()
 	PdhCollectQueryData(m_hQuery);
 
     if (ERROR_SUCCESS != PdhGetFormattedCounterValue( 
-                                    m_pCounterStruct->hCounter,
-                                    PDH_FMT_LONG,
-                                    NULL,
-                                    &pdhFormattedValue )) 
-
-
+		m_pCounterStruct->hCounter, PDH_FMT_LONG, NULL, &pdhFormattedValue))
 	{
 		return 0;
 	}
